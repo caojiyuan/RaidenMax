@@ -1,0 +1,16 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# 项目整体规范
+
+## 使用编程语言和框架
+- HTML5
+- CSS
+- JavaScript
+
+## 注释规范
+- 每一行代码都添加注释
+
+

@@ -1,0 +1,21 @@
+body {
+    margin: 0; /* 移除页面边距 */
+    padding: 0; /* 移除页面内边距 */
+    background-color: #000; /* 设置黑色背景 */
+    display: flex; /* 使用弹性布局 */
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+    height: 100vh; /* 设置高度为视口高度 */
+    overflow: hidden; /* 隐藏溢出内容 */
+}
+
+#game-container {
+    width: 800px; /* 设置容器宽度 */
+    height: 600px; /* 设置容器高度 */
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3); /* 添加轻微发光效果 */
+}
+
+canvas {
+    display: block; /* 设置为块级元素 */
+    margin: 0 auto; /* 居中显示 */
+} 
