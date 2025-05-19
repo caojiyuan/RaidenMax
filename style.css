@@ -10,8 +10,8 @@ body {
 }
 
 #game-container {
-    width: 800px; /* 设置容器宽度 */
-    height: 600px; /* 设置容器高度 */
+    width: 800px; /* 设置容器宽度，从1000px缩小回800px */
+    height: 800px; /* 设置容器高度，保持800px不变 */
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.3); /* 添加轻微发光效果 */
 }
 
