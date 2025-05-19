@@ -130,116 +130,485 @@ function createTextures() {
     textures.background = bgCanvas; // 保存背景纹理
     
     // 创建玩家纹理
-    const playerCanvas = createOffscreenCanvas(30, 30); // 玩家纹理画布
+    const playerCanvas = createOffscreenCanvas(40, 40); // 玩家纹理画布，尺寸增大
     const playerCtx = playerCanvas.getContext('2d'); // 玩家纹理上下文
     
-    // 绘制飞机主体
-    playerCtx.fillStyle = '#00ff00'; // 绿色
+    // 绘制高级战斗机
+    // 机身主体
+    playerCtx.fillStyle = '#00ffaa'; // 青绿色
     playerCtx.beginPath(); // 开始路径
-    playerCtx.moveTo(15, 0); // 三角形顶点
-    playerCtx.lineTo(0, 30); // 三角形左底点
-    playerCtx.lineTo(30, 30); // 三角形右底点
+    playerCtx.moveTo(20, 0); // 顶点
+    playerCtx.lineTo(5, 30); // 左下角
+    playerCtx.lineTo(35, 30); // 右下角
     playerCtx.closePath(); // 闭合路径
     playerCtx.fill(); // 填充
     
-    // 绘制机翼
-    playerCtx.fillStyle = '#33ff33'; // 淡绿色
-    playerCtx.fillRect(0, 20, 30, 5); // 机翼
+    // 机翼
+    playerCtx.fillStyle = '#00ccaa'; // 深青色
+    playerCtx.beginPath(); // 开始路径
+    playerCtx.moveTo(5, 20); // 左机翼外侧
+    playerCtx.lineTo(0, 28); // 左机翼尖
+    playerCtx.lineTo(15, 25); // 左机翼内侧
+    playerCtx.closePath(); // 闭合路径
+    playerCtx.fill(); // 填充
     
-    // 绘制舱室
-    playerCtx.fillStyle = '#0000ff'; // 蓝色
-    playerCtx.fillRect(12, 15, 6, 10); // 舱室
+    playerCtx.beginPath(); // 开始路径
+    playerCtx.moveTo(35, 20); // 右机翼外侧
+    playerCtx.lineTo(40, 28); // 右机翼尖
+    playerCtx.lineTo(25, 25); // 右机翼内侧
+    playerCtx.closePath(); // 闭合路径
+    playerCtx.fill(); // 填充
+    
+    // 尾翼
+    playerCtx.fillStyle = '#00aa99'; // 蓝绿色
+    playerCtx.beginPath(); // 开始路径
+    playerCtx.moveTo(15, 30); // 左尾翼内侧
+    playerCtx.lineTo(5, 40); // 左尾翼尖
+    playerCtx.lineTo(17, 35); // 左尾翼连接点
+    playerCtx.closePath(); // 闭合路径
+    playerCtx.fill(); // 填充
+    
+    playerCtx.beginPath(); // 开始路径
+    playerCtx.moveTo(25, 30); // 右尾翼内侧
+    playerCtx.lineTo(35, 40); // 右尾翼尖
+    playerCtx.lineTo(23, 35); // 右尾翼连接点
+    playerCtx.closePath(); // 闭合路径
+    playerCtx.fill(); // 填充
+    
+    // 驾驶舱
+    playerCtx.fillStyle = '#4444ff'; // 蓝色
+    playerCtx.beginPath(); // 开始路径
+    playerCtx.ellipse(20, 15, 5, 8, 0, 0, Math.PI * 2); // 椭圆形驾驶舱
+    playerCtx.fill(); // 填充
+    
+    // 驾驶舱高光
+    playerCtx.fillStyle = '#aaaaff'; // 亮蓝色
+    playerCtx.beginPath(); // 开始路径
+    playerCtx.ellipse(18, 13, 2, 4, 0, 0, Math.PI * 2); // 椭圆形高光
+    playerCtx.fill(); // 填充
+    
+    // 引擎喷射
+    playerCtx.fillStyle = '#ffff00'; // 黄色
+    playerCtx.beginPath(); // 开始路径
+    playerCtx.moveTo(18, 30); // 左侧
+    playerCtx.lineTo(20, 38); // 中间
+    playerCtx.lineTo(22, 30); // 右侧
+    playerCtx.closePath(); // 闭合路径
+    playerCtx.fill(); // 填充
+    
+    // 装甲细节
+    playerCtx.strokeStyle = '#007766'; // 深青色
+    playerCtx.lineWidth = 1; // 线宽
+    playerCtx.beginPath(); // 开始路径
+    playerCtx.moveTo(20, 5); // 顶部中央
+    playerCtx.lineTo(20, 25); // 底部中央
+    playerCtx.moveTo(15, 20); // 左侧中部
+    playerCtx.lineTo(25, 20); // 右侧中部
+    playerCtx.stroke(); // 描边
     
     textures.player = playerCanvas; // 保存玩家纹理
     
     // 创建敌机纹理（杂兵）
-    const enemyCanvas = createOffscreenCanvas(30, 30); // 敌机纹理画布
+    const enemyCanvas = createOffscreenCanvas(40, 40); // 敌机纹理画布
     const enemyCtx = enemyCanvas.getContext('2d'); // 敌机纹理上下文
     
-    // 绘制敌机主体
-    enemyCtx.fillStyle = '#ff0000'; // 红色
+    // 绘制基础敌机
+    // 机身
+    enemyCtx.fillStyle = '#ff3333'; // 红色
     enemyCtx.beginPath(); // 开始路径
-    enemyCtx.moveTo(15, 30); // 三角形底部中点
-    enemyCtx.lineTo(0, 0); // 三角形左顶点
-    enemyCtx.lineTo(30, 0); // 三角形右顶点
+    enemyCtx.moveTo(20, 40); // 底部中点
+    enemyCtx.lineTo(0, 10); // 左上角
+    enemyCtx.lineTo(40, 10); // 右上角
     enemyCtx.closePath(); // 闭合路径
     enemyCtx.fill(); // 填充
     
-    // 绘制机翼
-    enemyCtx.fillStyle = '#ff5555'; // 淡红色
-    enemyCtx.fillRect(0, 5, 30, 5); // 机翼
+    // 机首
+    enemyCtx.fillStyle = '#990000'; // 深红色
+    enemyCtx.beginPath(); // 开始路径
+    enemyCtx.moveTo(15, 10); // 左边
+    enemyCtx.lineTo(20, 0); // 顶部
+    enemyCtx.lineTo(25, 10); // 右边
+    enemyCtx.closePath(); // 闭合路径
+    enemyCtx.fill(); // 填充
     
-    // 绘制舱室
-    enemyCtx.fillStyle = '#ffff00'; // 黄色
-    enemyCtx.fillRect(12, 5, 6, 10); // 舱室
+    // 机翼
+    enemyCtx.fillStyle = '#cc0000'; // 中红色
+    enemyCtx.beginPath(); // 开始路径
+    enemyCtx.moveTo(0, 10); // 左上角
+    enemyCtx.lineTo(0, 25); // 左下角
+    enemyCtx.lineTo(15, 20); // 左机身连接点
+    enemyCtx.closePath(); // 闭合路径
+    enemyCtx.fill(); // 填充
+    
+    enemyCtx.beginPath(); // 开始路径
+    enemyCtx.moveTo(40, 10); // 右上角
+    enemyCtx.lineTo(40, 25); // 右下角
+    enemyCtx.lineTo(25, 20); // 右机身连接点
+    enemyCtx.closePath(); // 闭合路径
+    enemyCtx.fill(); // 填充
+    
+    // 武器挂载
+    enemyCtx.fillStyle = '#333333'; // 深灰色
+    enemyCtx.beginPath(); // 开始路径
+    enemyCtx.rect(10, 25, 5, 10); // 左侧武器
+    enemyCtx.rect(25, 25, 5, 10); // 右侧武器
+    enemyCtx.fill(); // 填充
+    
+    // 驾驶舱
+    enemyCtx.fillStyle = '#444444'; // 灰色
+    enemyCtx.beginPath(); // 开始路径
+    enemyCtx.ellipse(20, 20, 5, 8, 0, 0, Math.PI * 2); // 椭圆形驾驶舱
+    enemyCtx.fill(); // 填充
+    
+    // 驾驶舱高光
+    enemyCtx.fillStyle = '#666666'; // 亮灰色
+    enemyCtx.beginPath(); // 开始路径
+    enemyCtx.ellipse(22, 18, 2, 4, 0, 0, Math.PI * 2); // 椭圆形高光
+    enemyCtx.fill(); // 填充
+    
+    // 装甲细节
+    enemyCtx.strokeStyle = '#660000'; // 深红色
+    enemyCtx.lineWidth = 1; // 线宽
+    enemyCtx.beginPath(); // 开始路径
+    enemyCtx.moveTo(20, 10); // 顶部中央
+    enemyCtx.lineTo(20, 35); // 底部中央
+    enemyCtx.stroke(); // 描边
     
     textures.enemy = enemyCanvas; // 保存敌机纹理
     
     // 创建精英敌机纹理
-    const eliteCanvas = createOffscreenCanvas(40, 40); // 精英敌机纹理画布
+    const eliteCanvas = createOffscreenCanvas(50, 50); // 精英敌机纹理画布
     const eliteCtx = eliteCanvas.getContext('2d'); // 精英敌机纹理上下文
     
-    // 绘制敌机主体
-    eliteCtx.fillStyle = '#ff0055'; // 深粉色
+    // 绘制精英敌机
+    // 核心机身
+    eliteCtx.fillStyle = '#cc00cc'; // 紫色
     eliteCtx.beginPath(); // 开始路径
-    eliteCtx.moveTo(20, 40); // 三角形底部中点
-    eliteCtx.lineTo(0, 0); // 三角形左顶点
-    eliteCtx.lineTo(40, 0); // 三角形右顶点
+    eliteCtx.ellipse(25, 25, 15, 20, 0, 0, Math.PI * 2); // 椭圆形机身
+    eliteCtx.fill(); // 填充
+    
+    // 前部尖锥
+    eliteCtx.beginPath(); // 开始路径
+    eliteCtx.moveTo(15, 10); // 左上
+    eliteCtx.lineTo(25, 0); // 顶部
+    eliteCtx.lineTo(35, 10); // 右上
     eliteCtx.closePath(); // 闭合路径
     eliteCtx.fill(); // 填充
     
-    // 绘制机翼
-    eliteCtx.fillStyle = '#ff5599'; // 亮粉色
-    eliteCtx.fillRect(0, 10, 40, 8); // 机翼
+    // 四个机翼
+    eliteCtx.fillStyle = '#aa00aa'; // 深紫色
     
-    // 绘制舱室
-    eliteCtx.fillStyle = '#ffff00'; // 黄色
-    eliteCtx.fillRect(15, 10, 10, 15); // 舱室
+    // 前上机翼
+    eliteCtx.beginPath(); // 开始路径
+    eliteCtx.moveTo(10, 15); // 内侧
+    eliteCtx.lineTo(0, 5); // 尖端
+    eliteCtx.lineTo(15, 20); // 连接点
+    eliteCtx.closePath(); // 闭合路径
+    eliteCtx.fill(); // 填充
+    
+    // 前下机翼
+    eliteCtx.beginPath(); // 开始路径
+    eliteCtx.moveTo(40, 15); // 内侧
+    eliteCtx.lineTo(50, 5); // 尖端
+    eliteCtx.lineTo(35, 20); // 连接点
+    eliteCtx.closePath(); // 闭合路径
+    eliteCtx.fill(); // 填充
+    
+    // 后上机翼
+    eliteCtx.beginPath(); // 开始路径
+    eliteCtx.moveTo(10, 35); // 内侧
+    eliteCtx.lineTo(0, 45); // 尖端
+    eliteCtx.lineTo(15, 30); // 连接点
+    eliteCtx.closePath(); // 闭合路径
+    eliteCtx.fill(); // 填充
+    
+    // 后下机翼
+    eliteCtx.beginPath(); // 开始路径
+    eliteCtx.moveTo(40, 35); // 内侧
+    eliteCtx.lineTo(50, 45); // 尖端
+    eliteCtx.lineTo(35, 30); // 连接点
+    eliteCtx.closePath(); // 闭合路径
+    eliteCtx.fill(); // 填充
+    
+    // 武器系统
+    eliteCtx.fillStyle = '#ff00ff'; // 亮紫色
+    eliteCtx.beginPath(); // 开始路径
+    eliteCtx.arc(25, 25, 8, 0, Math.PI * 2); // 中央武器核心
+    eliteCtx.fill(); // 填充
+    
+    // 四个武器炮管
+    eliteCtx.fillStyle = '#666666'; // 灰色
+    eliteCtx.fillRect(8, 23, 10, 4); // 左炮管
+    eliteCtx.fillRect(32, 23, 10, 4); // 右炮管
+    eliteCtx.fillRect(23, 8, 4, 10); // 上炮管
+    eliteCtx.fillRect(23, 32, 4, 10); // 下炮管
+    
+    // 能量脉冲效果
+    eliteCtx.strokeStyle = '#ff77ff'; // 亮粉色
+    eliteCtx.lineWidth = 2; // 线宽
+    eliteCtx.beginPath(); // 开始路径
+    eliteCtx.arc(25, 25, 12, 0, Math.PI * 2); // 能量场
+    eliteCtx.stroke(); // 描边
     
     textures.elite = eliteCanvas; // 保存精英敌机纹理
     
     // 创建BOSS纹理（三种）
     for (let i = 1; i <= 3; i++) {
-        const bossSize = 50 + i * 25; // 根据BOSS等级增加尺寸
+        const bossSize = 60 + i * 30; // 更大的BOSS尺寸
         const bossCanvas = createOffscreenCanvas(bossSize, bossSize); // BOSS纹理画布
         const bossCtx = bossCanvas.getContext('2d'); // BOSS纹理上下文
         
         // 根据关卡设置BOSS颜色
-        let mainColor, accentColor;
+        let mainColor, secondaryColor, accentColor, energyColor, darkColor;
         switch (i) {
-            case 1: mainColor = '#990000'; accentColor = '#ff3333'; break; // 红色系
-            case 2: mainColor = '#009900'; accentColor = '#33ff33'; break; // 绿色系
-            case 3: mainColor = '#000099'; accentColor = '#3333ff'; break; // 蓝色系
+            case 1: 
+                mainColor = '#990000'; 
+                secondaryColor = '#cc0000';
+                accentColor = '#ff3333'; 
+                energyColor = '#ffaa00';
+                darkColor = '#660000';
+                break; // 红色系
+            case 2: 
+                mainColor = '#009900'; 
+                secondaryColor = '#00cc00';
+                accentColor = '#33ff33'; 
+                energyColor = '#66ffaa';
+                darkColor = '#006600';
+                break; // 绿色系
+            case 3: 
+                mainColor = '#000099'; 
+                secondaryColor = '#0000cc';
+                accentColor = '#3333ff'; 
+                energyColor = '#aa66ff';
+                darkColor = '#000066';
+                break; // 蓝色系
         }
         
-        // 绘制BOSS主体
+        // 绘制不规则的主外壳（改为更具威胁性的形状）
         bossCtx.fillStyle = mainColor; // 主色调
+        
+        // 基础外壳 - 从椭圆形改为更具侵略性的六边形
+        bossCtx.beginPath();
+        const shellRadius = bossSize/2 - 5;
+        // 六边形外壳
+        for(let j = 0; j < 6; j++) {
+            const angle = Math.PI * 2 * j / 6 - Math.PI/6;
+            const x = bossSize/2 + Math.cos(angle) * shellRadius * (j % 2 ? 0.9 : 1.1); // 不规则六边形
+            const y = bossSize/2 + Math.sin(angle) * shellRadius * (j % 2 ? 0.9 : 1.1);
+            if(j === 0) bossCtx.moveTo(x, y);
+            else bossCtx.lineTo(x, y);
+        }
+        bossCtx.closePath();
+        bossCtx.fill();
+        
+        // 绘制底层装甲质感
+        bossCtx.fillStyle = darkColor;
+        // 创建装甲间的缝隙
+        for(let j = 0; j < 6; j++) {
+            const angle = Math.PI * 2 * j / 6 - Math.PI/6 + Math.PI/12; // 错开位置
+            const length = shellRadius * 0.7;
+            const width = shellRadius * 0.12;
+            
+            bossCtx.save();
+            bossCtx.translate(bossSize/2, bossSize/2);
+            bossCtx.rotate(angle);
+            bossCtx.fillRect(-width/2, -length/2, width, length);
+            bossCtx.restore();
+        }
+        
+        // 绘制金属质感的核心装甲（同心环形装甲）
+        bossCtx.fillStyle = secondaryColor; // 次色调
+        bossCtx.beginPath();
+        bossCtx.arc(bossSize/2, bossSize/2, shellRadius * 0.65, 0, Math.PI * 2);
+        bossCtx.fill();
+        
+        bossCtx.fillStyle = mainColor;
+        bossCtx.beginPath();
+        bossCtx.arc(bossSize/2, bossSize/2, shellRadius * 0.5, 0, Math.PI * 2);
+        bossCtx.fill();
+        
+        // 装甲板的金属反光线条
+        bossCtx.strokeStyle = accentColor;
+        bossCtx.lineWidth = 1;
+        bossCtx.setLineDash([]);
+        bossCtx.beginPath();
+        bossCtx.arc(bossSize/2, bossSize/2, shellRadius * 0.65, Math.PI * 0.2, Math.PI * 0.8);
+        bossCtx.stroke();
+        
+        bossCtx.beginPath();
+        bossCtx.arc(bossSize/2, bossSize/2, shellRadius * 0.5, Math.PI * 1.2, Math.PI * 1.8);
+        bossCtx.stroke();
+        
+        // 外部尖刺装甲（增加威胁感）
+        bossCtx.fillStyle = secondaryColor;
+        for(let j = 0; j < 8; j++) {
+            const angle = Math.PI * 2 * j / 8;
+            const spikeLength = shellRadius * 0.4;
+            const spikeWidth = shellRadius * 0.15;
+            
+            bossCtx.save();
+            bossCtx.translate(bossSize/2, bossSize/2);
+            bossCtx.rotate(angle);
+            bossCtx.translate(0, -shellRadius * 0.85);
+            
+            // 绘制尖刺
+            bossCtx.beginPath();
+            bossCtx.moveTo(0, 0);
+            bossCtx.lineTo(-spikeWidth/2, -spikeLength);
+            bossCtx.lineTo(spikeWidth/2, -spikeLength);
+            bossCtx.closePath();
+            bossCtx.fill();
+            
+            // 尖刺装饰线
+            bossCtx.strokeStyle = accentColor;
+            bossCtx.beginPath();
+            bossCtx.moveTo(0, -spikeLength/3);
+            bossCtx.lineTo(0, -spikeLength*0.9);
+            bossCtx.stroke();
+            
+            bossCtx.restore();
+        }
+        
+        // 绘制能量核心（更强大的脉冲核心）
+        const gradientRadius = bossSize/3;
+        const energyGradient = bossCtx.createRadialGradient(
+            bossSize/2, bossSize/2, 0,
+            bossSize/2, bossSize/2, gradientRadius
+        );
+        energyGradient.addColorStop(0, '#ffffff');
+        energyGradient.addColorStop(0.2, energyColor);
+        energyGradient.addColorStop(0.5, accentColor);
+        energyGradient.addColorStop(0.7, mainColor);
+        energyGradient.addColorStop(1, 'rgba(0,0,0,0)');
+        
+        bossCtx.fillStyle = energyGradient; // 渐变
         bossCtx.beginPath(); // 开始路径
-        bossCtx.arc(bossSize / 2, bossSize / 2, bossSize / 2, 0, Math.PI * 2); // 圆形
+        bossCtx.arc(bossSize/2, bossSize/2, gradientRadius, 0, Math.PI * 2); // 能量核心
         bossCtx.fill(); // 填充
         
-        // 绘制BOSS装甲
-        bossCtx.fillStyle = accentColor; // 次要色调
-        bossCtx.beginPath(); // 开始路径
-        bossCtx.arc(bossSize / 2, bossSize / 2, bossSize / 3, 0, Math.PI * 2); // 内圆
-        bossCtx.fill(); // 填充
+        // 核心几何线条（科技感）
+        bossCtx.strokeStyle = '#ffffff';
+        bossCtx.lineWidth = 1.5;
+        bossCtx.beginPath();
+        // 绘制六芒星
+        for(let j = 0; j < 6; j++) {
+            const angle = Math.PI * 2 * j / 6;
+            const x = bossSize/2 + Math.cos(angle) * gradientRadius * 0.5;
+            const y = bossSize/2 + Math.sin(angle) * gradientRadius * 0.5;
+            if(j === 0) bossCtx.moveTo(x, y);
+            else if(j % 2 === 0) bossCtx.lineTo(x, y); // 连接对角点
+        }
+        bossCtx.closePath();
+        bossCtx.stroke();
         
-        // 绘制BOSS核心（弱点）
+        // 再次从起点开始连接其他点
+        bossCtx.beginPath();
+        for(let j = 1; j < 6; j+=2) {
+            const angle = Math.PI * 2 * j / 6;
+            const x = bossSize/2 + Math.cos(angle) * gradientRadius * 0.5;
+            const y = bossSize/2 + Math.sin(angle) * gradientRadius * 0.5;
+            if(j === 1) bossCtx.moveTo(x, y);
+            else bossCtx.lineTo(x, y);
+        }
+        bossCtx.closePath();
+        bossCtx.stroke();
+        
+        // 绘制外层防护罩（科技感力场）
+        bossCtx.strokeStyle = accentColor; // 次要色调
+        bossCtx.lineWidth = 3; // 线宽
+        bossCtx.setLineDash([8, 3]); // 更科技感的虚线样式
+        
+        // 双层防护罩
+        bossCtx.beginPath(); // 开始路径
+        bossCtx.arc(bossSize/2, bossSize/2, bossSize/2 - 4, 0, Math.PI * 2); // 外层防护罩
+        bossCtx.stroke(); // 描边
+        
+        bossCtx.beginPath(); // 开始路径
+        bossCtx.arc(bossSize/2, bossSize/2, bossSize/2 - 12, 0, Math.PI * 2); // 内层防护罩
+        bossCtx.stroke(); // 描边
+        
+        // 绘制武器系统（更具威慑力）
+        const weaponCount = i + 5; // 关卡越高武器越多
+        
+        for (let j = 0; j < weaponCount; j++) {
+            const angle = Math.PI * 2 * j / weaponCount;
+            const distance = bossSize/2 - 20;
+            const x = bossSize/2 + Math.cos(angle) * distance;
+            const y = bossSize/2 + Math.sin(angle) * distance;
+            const weaponSize = bossSize/8.5;
+            
+            // 武器底座
+            bossCtx.fillStyle = darkColor; // 暗色调
+            bossCtx.beginPath(); // 开始路径
+            bossCtx.arc(x, y, weaponSize * 1.2, 0, Math.PI * 2); // 底座
+            bossCtx.fill(); // 填充
+            
+            // 武器炮台
+            bossCtx.fillStyle = secondaryColor; // 次色调
+            bossCtx.beginPath(); // 开始路径
+            bossCtx.arc(x, y, weaponSize, 0, Math.PI * 2); // 炮台
+            bossCtx.fill(); // 填充
+            
+            // 炮口 - 更具威慑力的设计
+            const barrelLength = weaponSize * 1.5;
+            const barrelWidth = weaponSize * 0.4;
+            
+            bossCtx.save();
+            bossCtx.translate(x, y);
+            bossCtx.rotate(angle);
+            
+            // 炮筒
+            bossCtx.fillStyle = darkColor;
+            bossCtx.fillRect(-barrelWidth/2, -barrelLength, barrelWidth, barrelLength);
+            
+            // 炮口闪光
+            bossCtx.fillStyle = energyColor;
+            bossCtx.beginPath();
+            bossCtx.arc(0, -barrelLength, barrelWidth/2, 0, Math.PI * 2);
+            bossCtx.fill();
+            
+            bossCtx.restore();
+            
+            // 能量连接线
+            bossCtx.strokeStyle = energyColor; // 能量色
+            bossCtx.lineWidth = 2; // 线宽
+            bossCtx.setLineDash([]); // 实线
+            bossCtx.beginPath(); // 开始路径
+            bossCtx.moveTo(bossSize/2, bossSize/2); // 中心
+            bossCtx.lineTo(x, y); // 武器位置
+            bossCtx.stroke(); // 描边
+        }
+        
+        // 添加科技感细节线条
+        bossCtx.strokeStyle = accentColor;
+        bossCtx.lineWidth = 1;
+        bossCtx.setLineDash([]);
+        
+        // 扫描线效果
+        const scanLineY = bossSize/2;
+        bossCtx.beginPath();
+        bossCtx.moveTo(bossSize/2 - shellRadius * 0.8, scanLineY);
+        bossCtx.lineTo(bossSize/2 + shellRadius * 0.8, scanLineY);
+        bossCtx.stroke();
+        
+        // 核心闪光效果
         bossCtx.fillStyle = '#ffffff'; // 白色
         bossCtx.beginPath(); // 开始路径
-        bossCtx.arc(bossSize / 2, bossSize / 2, bossSize / 6, 0, Math.PI * 2); // 中心
+        bossCtx.arc(bossSize/2 - gradientRadius/3, bossSize/2 - gradientRadius/3, gradientRadius/6, 0, Math.PI * 2); // 闪光点
         bossCtx.fill(); // 填充
         
-        // 绘制BOSS武器
-        for (let j = 0; j < i + 3; j++) { // 根据关卡增加武器数量
-            const angle = Math.PI * 2 * j / (i + 3);
-            const x = bossSize / 2 + Math.cos(angle) * (bossSize / 2 - 10);
-            const y = bossSize / 2 + Math.sin(angle) * (bossSize / 2 - 10);
+        // 添加小型指示灯
+        for(let j = 0; j < 4; j++) {
+            const angle = Math.PI * 2 * j / 4;
+            const radius = shellRadius * 0.75;
+            const dotSize = shellRadius * 0.05;
+            const x = bossSize/2 + Math.cos(angle) * radius;
+            const y = bossSize/2 + Math.sin(angle) * radius;
             
-            bossCtx.fillStyle = '#ffff00'; // 黄色
-            bossCtx.beginPath(); // 开始路径
-            bossCtx.arc(x, y, 5, 0, Math.PI * 2); // 武器节点
-            bossCtx.fill(); // 填充
+            bossCtx.fillStyle = j % 2 === 0 ? energyColor : '#ffffff';
+            bossCtx.beginPath();
+            bossCtx.arc(x, y, dotSize, 0, Math.PI * 2);
+            bossCtx.fill();
         }
         
         textures[`boss${i}`] = bossCanvas; // 保存BOSS纹理
@@ -309,50 +678,154 @@ function createTextures() {
     };
     
     powerupTypes.forEach(type => {
-        const powerupCanvas = createOffscreenCanvas(20, 20); // 道具纹理画布
+        // 根据类型确定画布大小
+        let canvasSize = 20; // 默认尺寸
+        
+        // 宝箱需要更大的尺寸
+        if (type === 'weapon') {
+            canvasSize = 30; // 增大宝箱尺寸
+        }
+        
+        const powerupCanvas = createOffscreenCanvas(canvasSize, canvasSize); // 道具纹理画布
         const powerupCtx = powerupCanvas.getContext('2d'); // 道具纹理上下文
         
-        // 绘制道具背景
-        powerupCtx.fillStyle = powerupColors[type]; // 根据类型设置颜色
-        powerupCtx.beginPath(); // 开始路径
-        powerupCtx.arc(10, 10, 8, 0, Math.PI * 2); // 圆形
-        powerupCtx.fill(); // 填充
-        
-        // 绘制道具边框
-        powerupCtx.strokeStyle = '#ffffff'; // 白色边框
-        powerupCtx.lineWidth = 2; // 边框宽度
-        powerupCtx.beginPath(); // 开始路径
-        powerupCtx.arc(10, 10, 9, 0, Math.PI * 2); // 圆形
-        powerupCtx.stroke(); // 描边
-        
-        // 根据类型绘制图标
-        powerupCtx.fillStyle = '#ffffff'; // 白色
+        // 根据类型绘制道具
         switch (type) {
             case 'weapon':
-                // 武器图标（星形）
+                // 华贵宝箱 - 增大尺寸后的绘制
+                // 宝箱底座 - 金色
+                powerupCtx.fillStyle = '#d4af37'; // 金色
+                powerupCtx.fillRect(6, 15, 18, 11); // 宝箱主体
+                
+                // 宝箱盖 - 金色弧形
                 powerupCtx.beginPath();
-                for (let i = 0; i < 5; i++) {
-                    const angle = Math.PI / 2 + Math.PI * 2 / 5 * i;
-                    const x1 = 10 + Math.cos(angle) * 5;
-                    const y1 = 10 + Math.sin(angle) * 5;
-                    const x2 = 10 + Math.cos(angle + Math.PI / 5) * 3;
-                    const y2 = 10 + Math.sin(angle + Math.PI / 5) * 3;
-                    if (i === 0) powerupCtx.moveTo(x1, y1);
-                    else powerupCtx.lineTo(x1, y1);
-                    powerupCtx.lineTo(x2, y2);
+                powerupCtx.moveTo(6, 15);
+                powerupCtx.lineTo(6, 12);
+                powerupCtx.quadraticCurveTo(15, 6, 24, 12);
+                powerupCtx.lineTo(24, 15);
+                powerupCtx.closePath();
+                powerupCtx.fill();
+                
+                // 宝箱锁扣 - 深金色
+                powerupCtx.fillStyle = '#aa8c2c'; // 深金色
+                powerupCtx.fillRect(13.5, 13.5, 3, 4.5);
+                
+                // 宝箱花纹装饰
+                powerupCtx.strokeStyle = '#ffcf40'; // 亮金色
+                powerupCtx.lineWidth = 0.8;
+                powerupCtx.strokeRect(8, 17, 14, 7);
+                
+                // 内部装饰线
+                powerupCtx.beginPath();
+                powerupCtx.moveTo(8, 20);
+                powerupCtx.lineTo(22, 20);
+                powerupCtx.stroke();
+                
+                // 宝箱上的宝石
+                powerupCtx.fillStyle = '#ff3366'; // 红宝石色
+                powerupCtx.beginPath();
+                powerupCtx.arc(15, 10, 2.5, 0, Math.PI * 2);
+                powerupCtx.fill();
+                
+                // 宝石高光
+                powerupCtx.fillStyle = '#ffffff';
+                powerupCtx.globalAlpha = 0.7;
+                powerupCtx.beginPath();
+                powerupCtx.arc(14, 9, 0.8, 0, Math.PI * 2);
+                powerupCtx.fill();
+                powerupCtx.globalAlpha = 1.0;
+                
+                // 侧边宝石装饰
+                powerupCtx.fillStyle = '#00ccff'; // 蓝宝石色
+                powerupCtx.beginPath();
+                powerupCtx.arc(7, 17, 1.2, 0, Math.PI * 2);
+                powerupCtx.fill();
+                
+                powerupCtx.fillStyle = '#33ff66'; // 绿宝石色
+                powerupCtx.beginPath();
+                powerupCtx.arc(23, 17, 1.2, 0, Math.PI * 2);
+                powerupCtx.fill();
+                
+                // 金色光芒效果
+                powerupCtx.strokeStyle = '#ffec8b'; // 淡金色
+                powerupCtx.lineWidth = 0.5;
+                for (let i = 0; i < 8; i++) {
+                    const angle = Math.PI * 2 * i / 8;
+                    const length = 4 + Math.random() * 3;
+                    powerupCtx.beginPath();
+                    powerupCtx.moveTo(15, 15);
+                    powerupCtx.lineTo(
+                        15 + Math.cos(angle) * length,
+                        15 + Math.sin(angle) * length
+                    );
+                    powerupCtx.stroke();
                 }
+                
+                // 闪光效果
+                powerupCtx.fillStyle = '#fffacd'; // 淡黄色
+                powerupCtx.globalAlpha = 0.5;
+                powerupCtx.beginPath();
+                powerupCtx.arc(21, 19, 1.5, 0, Math.PI * 2);
+                powerupCtx.fill();
+                
+                powerupCtx.beginPath();
+                powerupCtx.arc(9, 22, 1, 0, Math.PI * 2);
+                powerupCtx.fill();
+                powerupCtx.globalAlpha = 1.0;
+                break;
+                
+            case 'health':
+                // 医疗包样式
+                // 白色背景方盒
+                powerupCtx.fillStyle = '#ffffff'; // 白色底色
+                powerupCtx.fillRect(4, 5, 12, 10); // 方形医疗包主体
+                
+                // 盒子边框
+                powerupCtx.strokeStyle = '#dddddd'; // 浅灰色边框
+                powerupCtx.lineWidth = 1;
+                powerupCtx.strokeRect(4, 5, 12, 10);
+                
+                // 红色十字标志
+                powerupCtx.fillStyle = '#ff0000'; // 红色
+                // 水平部分
+                powerupCtx.fillRect(6, 9, 8, 2);
+                // 垂直部分
+                powerupCtx.fillRect(9, 6, 2, 8);
+                
+                // 光泽效果
+                powerupCtx.fillStyle = 'rgba(255, 255, 255, 0.6)'; // 半透明白色
+                powerupCtx.beginPath();
+                powerupCtx.moveTo(4, 5); // 左上角
+                powerupCtx.lineTo(7, 5); // 上边中点
+                powerupCtx.lineTo(5, 9); // 左边中点
+                powerupCtx.closePath();
+                powerupCtx.fill();
+                
+                // 投影效果
+                powerupCtx.fillStyle = 'rgba(0, 0, 0, 0.2)'; // 半透明黑色
+                powerupCtx.beginPath();
+                powerupCtx.moveTo(16, 5); // 右上角
+                powerupCtx.lineTo(16, 15); // 右下角
+                powerupCtx.lineTo(13, 15); // 下边中点
                 powerupCtx.closePath();
                 powerupCtx.fill();
                 break;
                 
-            case 'health':
-                // 生命值图标（十字）
-                powerupCtx.fillRect(7, 4, 6, 12);
-                powerupCtx.fillRect(4, 7, 12, 6);
-                break;
-                
             case 'shield':
                 // 护盾图标（圆环）
+                powerupCtx.fillStyle = powerupColors[type]; // 根据类型设置颜色
+                powerupCtx.beginPath(); // 开始路径
+                powerupCtx.arc(10, 10, 8, 0, Math.PI * 2); // 圆形
+                powerupCtx.fill(); // 填充
+                
+                // 绘制道具边框
+                powerupCtx.strokeStyle = '#ffffff'; // 白色边框
+                powerupCtx.lineWidth = 2; // 边框宽度
+                powerupCtx.beginPath(); // 开始路径
+                powerupCtx.arc(10, 10, 9, 0, Math.PI * 2); // 圆形
+                powerupCtx.stroke(); // 描边
+                
+                powerupCtx.fillStyle = '#ffffff'; // 白色
                 powerupCtx.beginPath();
                 powerupCtx.arc(10, 10, 4, 0, Math.PI * 2);
                 powerupCtx.stroke();
@@ -964,8 +1437,8 @@ function spawnBoss() {
                 width: 100, // 宽度
                 height: 100, // 高度
                 speed: 1, // 速度
-                health: 30, // 生命值
-                maxHealth: 30, // 最大生命值
+                health: 100, // 生命值
+                maxHealth: 100, // 最大生命值
                 damage: 3, // 伤害值
                 score: 1000, // 分数
                 phase: 1, // 阶段
@@ -987,7 +1460,7 @@ function spawnBoss() {
                 width: 120, // 宽度
                 height: 120, // 高度
                 speed: 1.5, // 速度
-                health: 50, // 生命值
+                health: 250, // 生命值
                 maxHealth: 50, // 最大生命值
                 damage: 4, // 伤害值
                 score: 2000, // 分数
@@ -1012,8 +1485,8 @@ function spawnBoss() {
                 width: 150, // 宽度
                 height: 150, // 高度
                 speed: 2, // 速度
-                health: 80, // 生命值
-                maxHealth: 80, // 最大生命值
+                health: 380, // 生命值
+                maxHealth: 380, // 最大生命值
                 damage: 5, // 伤害值
                 score: 3000, // 分数
                 phase: 1, // 阶段
@@ -1093,12 +1566,18 @@ function spawnPowerup() {
     const types = ['weapon', 'health', 'shield'];
     const type = types[Math.floor(Math.random() * types.length)];
     
+    // 根据类型设置尺寸
+    let width = 20, height = 20; // 默认尺寸
+    if (type === 'weapon') {
+        width = height = 30; // 宝箱使用更大的尺寸
+    }
+    
     // 创建道具
     const powerup = {
-        x: Math.random() * (GAME_WIDTH - 20), // 随机X坐标
-        y: -20, // 屏幕顶部以上
-        width: 20, // 宽度
-        height: 20, // 高度
+        x: Math.random() * (GAME_WIDTH - width), // 随机X坐标
+        y: -height, // 屏幕顶部以上
+        width: width, // 宽度
+        height: height, // 高度
         speed: 2, // 速度
         type: type, // 道具类型
         texture: type // 纹理名称
@@ -1167,14 +1646,23 @@ function checkCollisions() {
                     
                     // 有概率掉落道具
                     if (Math.random() < 0.2) {
+                        // 随机决定道具类型
+                        const powerupType = Math.random() < 0.7 ? 'weapon' : 'health';
+                        
+                        // 根据类型设置尺寸
+                        let width = 20, height = 20; // 默认尺寸
+                        if (powerupType === 'weapon') {
+                            width = height = 30; // 宝箱使用更大的尺寸
+                        }
+                        
                         const powerup = {
-                            x: enemy.x + enemy.width / 2 - 10, // 敌机中心位置
-                            y: enemy.y + enemy.height / 2 - 10, // 敌机中心位置
-                            width: 20, // 宽度
-                            height: 20, // 高度
+                            x: enemy.x + enemy.width / 2 - width / 2, // 敌机中心位置
+                            y: enemy.y + enemy.height / 2 - height / 2, // 敌机中心位置
+                            width: width, // 宽度
+                            height: height, // 高度
                             speed: 2, // 速度
-                            type: Math.random() < 0.7 ? 'weapon' : 'health', // 道具类型
-                            texture: Math.random() < 0.7 ? 'weapon' : 'health' // 纹理名称
+                            type: powerupType, // 道具类型
+                            texture: powerupType // 纹理名称
                         };
                         
                         powerups.push(powerup); // 添加到道具数组
@@ -1344,6 +1832,65 @@ function render() {
         // 根据敌机类型选择纹理
         const texture = textures[enemy.texture];
         if (texture) {
+            // BOSS特殊渲染效果
+            if (enemy.type === 'boss') {
+                // 为BOSS添加动态能量场效果
+                // 脉动光环
+                const pulseSize = Math.sin(Date.now() / 200) * 5 + 10; // 脉动大小
+                const pulseOpacity = Math.sin(Date.now() / 300) * 0.3 + 0.5; // 脉动透明度
+                
+                // 设置BOSS光环颜色
+                let energyGlowColor;
+                if (enemy.texture === 'boss1') energyGlowColor = 'rgba(255, 50, 0, ' + pulseOpacity + ')';
+                else if (enemy.texture === 'boss2') energyGlowColor = 'rgba(0, 255, 50, ' + pulseOpacity + ')';
+                else energyGlowColor = 'rgba(50, 0, 255, ' + pulseOpacity + ')';
+                
+                // 绘制能量光环
+                ctx.beginPath();
+                ctx.arc(
+                    enemy.x + enemy.width / 2,
+                    enemy.y + enemy.height / 2,
+                    enemy.width / 2 + pulseSize,
+                    0, Math.PI * 2
+                );
+                
+                // 创建径向渐变
+                const energyGlow = ctx.createRadialGradient(
+                    enemy.x + enemy.width / 2,
+                    enemy.y + enemy.height / 2,
+                    enemy.width / 2,
+                    enemy.x + enemy.width / 2,
+                    enemy.y + enemy.height / 2,
+                    enemy.width / 2 + pulseSize
+                );
+                
+                energyGlow.addColorStop(0, energyGlowColor);
+                energyGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                
+                ctx.fillStyle = energyGlow;
+                ctx.fill();
+                
+                // 武器充能效果
+                if (Date.now() - enemy.lastFired < enemy.fireRate / 2) {
+                    const chargePercent = (Date.now() - enemy.lastFired) / (enemy.fireRate / 2);
+                    const weaponCount = enemy.phase + 4; // 根据阶段增加武器数量
+                    
+                    for (let i = 0; i < weaponCount; i++) {
+                        const angle = Math.PI * 2 * i / weaponCount;
+                        const distance = enemy.width / 2 - 10;
+                        const x = enemy.x + enemy.width / 2 + Math.cos(angle) * distance;
+                        const y = enemy.y + enemy.height / 2 + Math.sin(angle) * distance;
+                        
+                        // 绘制充能效果
+                        ctx.beginPath();
+                        ctx.arc(x, y, 5 * chargePercent, 0, Math.PI * 2);
+                        ctx.fillStyle = energyGlowColor.replace(')', ', ' + chargePercent + ')');
+                        ctx.fill();
+                    }
+                }
+            }
+            
+            // 绘制敌机贴图
             ctx.drawImage(texture, enemy.x, enemy.y); // 绘制敌机
             
             // 如果是BOSS，绘制血条
@@ -1357,7 +1904,18 @@ function render() {
                 ctx.fillRect(enemy.x, enemy.y - 10, healthBarWidth, 5); // 背景
                 
                 // 绘制当前血量
-                ctx.fillStyle = '#ff0000'; // 红色
+                // 根据血量百分比改变颜色
+                const healthPercent = enemy.health / enemy.maxHealth;
+                let healthColor;
+                if (healthPercent > 0.6) {
+                    healthColor = '#00ff00'; // 绿色 (健康)
+                } else if (healthPercent > 0.3) {
+                    healthColor = '#ffff00'; // 黄色 (警告)
+                } else {
+                    healthColor = '#ff0000'; // 红色 (危险)
+                }
+                
+                ctx.fillStyle = healthColor;
                 ctx.fillRect(enemy.x, enemy.y - 10, currentHealthWidth, 5); // 血量
                 
                 // 绘制阶段指示器
@@ -1410,6 +1968,72 @@ function render() {
     for (const powerup of powerups) {
         const texture = textures[powerup.texture];
         if (texture) {
+            // 如果是宝箱，先绘制光环效果
+            if (powerup.type === 'weapon') {
+                // 创建闪耀光环
+                const gradient = ctx.createRadialGradient(
+                    powerup.x + powerup.width / 2, 
+                    powerup.y + powerup.height / 2, 
+                    powerup.width / 2,
+                    powerup.x + powerup.width / 2, 
+                    powerup.y + powerup.height / 2, 
+                    powerup.width * 0.8
+                );
+                gradient.addColorStop(0, 'rgba(255, 215, 0, 0.7)'); // 金色
+                gradient.addColorStop(1, 'rgba(255, 215, 0, 0)');   // 透明
+                
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(
+                    powerup.x + powerup.width / 2, 
+                    powerup.y + powerup.height / 2, 
+                    powerup.width * 0.8, 
+                    0, Math.PI * 2
+                );
+                ctx.fill();
+                
+                // 脉动效果 - 使用正弦函数使光环大小随时间变化
+                const pulseSize = Math.sin(Date.now() / 200) * 4 + 5; // 脉动大小 1-9
+                ctx.strokeStyle = 'rgba(255, 223, 0, 0.6)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(
+                    powerup.x + powerup.width / 2, 
+                    powerup.y + powerup.height / 2, 
+                    powerup.width / 2 + pulseSize, 
+                    0, Math.PI * 2
+                );
+                ctx.stroke();
+            } 
+            // 如果是医疗包，添加红色光晕
+            else if (powerup.type === 'health') {
+                // 脉动效果 - 使用正弦函数使红色光环产生呼吸效果
+                const pulseIntensity = Math.sin(Date.now() / 300) * 0.2 + 0.5; // 0.3-0.7之间呼吸
+                
+                // 创建红色光环
+                const gradient = ctx.createRadialGradient(
+                    powerup.x + powerup.width / 2, 
+                    powerup.y + powerup.height / 2, 
+                    powerup.width / 4,
+                    powerup.x + powerup.width / 2, 
+                    powerup.y + powerup.height / 2, 
+                    powerup.width * 0.8
+                );
+                gradient.addColorStop(0, `rgba(255, 50, 50, ${pulseIntensity})`); // 红色
+                gradient.addColorStop(1, 'rgba(255, 50, 50, 0)');   // 透明
+                
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(
+                    powerup.x + powerup.width / 2, 
+                    powerup.y + powerup.height / 2, 
+                    powerup.width * 0.8, 
+                    0, Math.PI * 2
+                );
+                ctx.fill();
+            }
+            
+            // 绘制道具贴图
             ctx.drawImage(texture, powerup.x, powerup.y); // 绘制道具
         }
     }
