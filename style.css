@@ -1,18 +1,130 @@
+/* 全局样式 */
+* {
+    margin: 0; /* 去除外边距 */
+    padding: 0; /* 去除内边距 */
+    box-sizing: border-box; /* 使用边框盒模型 */
+}
+
 body {
-    margin: 0; /* 移除页面边距 */
-    padding: 0; /* 移除页面内边距 */
-    background-color: #000; /* 设置黑色背景 */
+    font-family: 'Arial', sans-serif; /* 设置字体 */
+    background-color: #111; /* 深色背景 */
+    color: #fff; /* 白色文字 */
     display: flex; /* 使用弹性布局 */
     justify-content: center; /* 水平居中 */
     align-items: center; /* 垂直居中 */
-    height: 100vh; /* 设置高度为视口高度 */
+    min-height: 100vh; /* 最小高度为视口高度 */
     overflow: hidden; /* 隐藏溢出内容 */
 }
 
+/* 星空背景 */
+body::before {
+    content: ''; /* 必需的内容属性 */
+    position: fixed; /* 固定定位 */
+    top: 0; /* 顶部对齐 */
+    left: 0; /* 左侧对齐 */
+    width: 100%; /* 宽度100% */
+    height: 100%; /* 高度100% */
+    background-image: 
+        radial-gradient(2px 2px at 20px 30px, #eee, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 40px 70px, #fff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 50px 160px, #ddd, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 90px 40px, #fff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 130px 80px, #fff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 160px 120px, #ddd, rgba(0,0,0,0)); /* 创建星星 */
+    background-repeat: repeat; /* 背景重复 */
+    background-size: 200px 200px; /* 背景尺寸 */
+    z-index: -1; /* 负z-index放置在后面 */
+    animation: stars-move 100s linear infinite; /* 星空动画 */
+}
+
+/* 星空动画 */
+@keyframes stars-move {
+    0% {
+        background-position: 0 0; /* 初始位置 */
+    }
+    100% {
+        background-position: 0 1000px; /* 结束位置 */
+    }
+}
+
+.container {
+    display: flex; /* 使用弹性布局 */
+    flex-direction: column; /* 纵向排列 */
+    align-items: center; /* 水平居中 */
+    max-width: 1000px; /* 最大宽度 */
+    width: 100%; /* 宽度100% */
+    padding: 20px; /* 内边距 */
+}
+
+.game-header {
+    text-align: center; /* 文本居中 */
+    margin-bottom: 20px; /* 下外边距 */
+    width: 100%; /* 宽度100% */
+}
+
+.game-header h1 {
+    font-size: 3rem; /* 字号 */
+    color: #f7d100; /* 金色 */
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.7); /* 文字阴影 */
+    margin-bottom: 10px; /* 下外边距 */
+}
+
+.game-header p {
+    font-size: 1.2rem; /* 字号 */
+    color: #ccc; /* 浅灰色 */
+}
+
 #game-container {
-    width: 800px; /* 设置容器宽度，从1000px缩小回800px */
-    height: 800px; /* 设置容器高度，保持800px不变 */
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3); /* 添加轻微发光效果 */
+    width: 800px; /* 宽度 */
+    height: 800px; /* 高度 */
+    border: 2px solid #444; /* 边框 */
+    border-radius: 5px; /* 圆角 */
+    overflow: hidden; /* 隐藏溢出内容 */
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); /* 阴影 */
+    position: relative; /* 相对定位 */
+    background-color: #000; /* 黑色背景 */
+}
+
+.game-footer {
+    margin-top: 20px; /* 上外边距 */
+    text-align: center; /* 文本居中 */
+    width: 100%; /* 宽度100% */
+    color: #888; /* 灰色文字 */
+    font-size: 0.9rem; /* 字号 */
+}
+
+.game-footer p {
+    margin: 5px 0; /* 上下外边距 */
+}
+
+/* 响应式设计 */
+@media (max-width: 850px) {
+    #game-container {
+        width: 100%; /* 宽度100% */
+        height: auto; /* 自适应高度 */
+        aspect-ratio: 1 / 1; /* 保持1:1宽高比 */
+    }
+    
+    .game-header h1 {
+        font-size: 2rem; /* 较小字号 */
+    }
+}
+
+/* 添加闪烁按钮效果 */
+.game-header p {
+    animation: pulse 2s infinite; /* 脉冲动画 */
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 0.7; /* 初始透明度 */
+    }
+    50% {
+        opacity: 1; /* 中间透明度 */
+    }
+    100% {
+        opacity: 0.7; /* 结束透明度 */
+    }
 }
 
 canvas {

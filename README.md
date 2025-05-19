@@ -20,4 +20,12 @@
 - Cursor
 - HTML5
 - CSS
-- JavaScript (Phaser.js)
+
+
+## 游戏演示
+
+👉 [点击这里在线游玩](https://caojiyuan.github.io/fire)
+
+![游戏截图](screenshot.png)
+
+

@@ -3,13 +3,23 @@
 <head>
     <meta charset="UTF-8"> <!-- 设置字符编码 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- 设置视口 -->
-    <title>雷电射击游戏</title> <!-- 设置页面标题 -->
+    <title>火力全开 - 飞机射击游戏</title> <!-- 设置页面标题 -->
     <link rel="stylesheet" href="style.css"> <!-- 引入CSS样式文件 -->
     <link rel="icon" href="favicon.ico" type="image/x-icon"> <!-- 添加网站图标 -->
     <script src="assets/js/phaser.min.js"></script> <!-- 引入本地Phaser.js库 -->
 </head>
 <body>
-    <div id="game-container"></div> <!-- 游戏容器 -->
+    <div class="container">
+        <div class="game-header">
+            <h1>火力全开</h1>
+            <p>使用方向键移动飞机，自动射击</p>
+        </div>
+        <div id="game-container"></div> <!-- 游戏容器 -->
+        <div class="game-footer">
+            <p>武器等级: 1-基本子弹 | 2-开花弹 | 3-瀑布弹 | 4-究极弹</p>
+            <p>© 2023 射击游戏演示</p>
+        </div>
+    </div>
     
     <!-- 游戏脚本 -->
     <script src="game.js"></script> <!-- 引入游戏主脚本 -->
