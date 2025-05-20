@@ -324,12 +324,338 @@ function createTextures() {
         
         // 右武器
         ctx.beginPath(); // 开始路径
-        ctx.rect(28, 18, 6, 2); // 右侧武器舱
+// 游戏变量
+const GAME_WIDTH = 800; // 游戏宽度
+const GAME_HEIGHT = 800; // 游戏高度
+let player; // 玩家飞机
+let enemies = []; // 敌机数组
+let bullets = []; // 玩家子弹数组
+let enemyBullets = []; // 敌人子弹数组
+let powerups = []; // 武器升级道具数组
+let explosions = []; // 爆炸效果数组
+let score = 0; // 分数
+let gameOver = false; // 游戏结束标志
+let gameWin = false; // 游戏胜利标志
+let lastFired = 0; // 上次射击时间
+let lastEnemyFired = 0; // 敌人上次射击时间
+let lastPowerupTime = 0; // 上次生成道具时间
+let currentLevel = 1; // 当前关卡
+let bossActive = false; // 是否激活BOSS
+let levelTimer = 0; // 关卡计时器
+let canvas, ctx; // 画布和上下文
+let textures = {}; // 纹理对象
+let keys = { // 键盘状态对象
+    left: false, // 左方向键
+    right: false, // 右方向键
+    up: false, // 上方向键
+    down: false, // 下方向键
+    space: false // 空格键
+};
+let isMobile = false; // 是否为移动设备
+let isJoystickActive = false; // 摇杆是否激活
+let joystickPosition = { x: 0, y: 0 }; // 摇杆位置
+let joystickThumbPosition = { x: 0, y: 0 }; // 摇杆手柄位置
+let joystickVector = { x: 0, y: 0 }; // 摇杆向量
+let touchId = null; // 触摸ID，用于追踪多点触控
+let gameLoopId = null; // 游戏循环ID
+let lastFrameTime = 0; // 上一帧时间
+let mobileSetting = { // 移动设备设置
+    particleCount: 0.5, // 粒子效果数量缩放比例
+    lowGraphics: false, // 是否启用低画质模式
+    fps: 60 // 帧率
+};
+
+// 武器等级配置
+const WEAPON_CONFIGS = {
+    1: { // 基本子弹
+        bulletCount: 1, // 子弹数量
+        damage: 1, // 伤害值
+        color: '#ffff00', // 黄色
+        size: {width: 4, height: 10} // 子弹尺寸
+    },
+    2: { // 开花弹
+        bulletCount: 3, // 子弹数量
+        damage: 1, // 伤害值
+        color: '#00ffff', // 青色
+        size: {width: 4, height: 10} // 子弹尺寸
+    },
+    3: { // 瀑布弹
+        bulletCount: 3, // 子弹数量
+        damage: 2, // 伤害值
+        color: '#ff00ff', // 品红色
+        size: {width: 6, height: 12} // 子弹尺寸
+    },
+    4: { // 究极弹
+        bulletCount: 5, // 子弹数量
+        damage: 3, // 伤害值
+        color: '#ffffff', // 白色
+        size: {width: 8, height: 15} // 子弹尺寸
+    }
+};
+
+// 创建游戏纹理
+function createTextures() {
+    // 创建离屏画布来生成纹理
+    const createOffscreenTexture = (width, height, callback) => {
+        const offCanvas = document.createElement('canvas'); // 创建离屏画布
+        offCanvas.width = width; // 设置宽度
+        offCanvas.height = height; // 设置高度
+        const offCtx = offCanvas.getContext('2d'); // 获取上下文
+        callback(offCtx); // 绘制内容
+        return offCanvas; // 返回画布作为纹理
+    };
+    
+    // 背景纹理
+    textures.background = createOffscreenTexture(GAME_WIDTH, GAME_HEIGHT, (ctx) => {
+        // 深色背景
+        ctx.fillStyle = '#000'; // 黑色背景
+        ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT); // 填充整个画布
+        
+        // 绘制星星
+        ctx.fillStyle = '#FFF'; // 白色星星
+        for (let i = 0; i < 200; i++) {
+            const x = Math.random() * GAME_WIDTH; // 随机X坐标
+            const y = Math.random() * GAME_HEIGHT; // 随机Y坐标
+            const size = Math.random() * 2 + 1; // 随机大小
+            ctx.fillRect(x, y, size, size); // 绘制星星
+        }
+        
+        // 添加一些远景星云
+        ctx.fillStyle = 'rgba(50, 30, 100, 0.2)'; // 紫色星云
+        for (let i = 0; i < 5; i++) {
+            const x = Math.random() * GAME_WIDTH; // 随机X坐标
+            const y = Math.random() * GAME_HEIGHT; // 随机Y坐标
+            const radius = Math.random() * 150 + 50; // 随机半径
+            
+            // 绘制模糊星云
+            ctx.beginPath(); // 开始路径
+            ctx.arc(x, y, radius, 0, Math.PI * 2); // 绘制圆形
+            ctx.fill(); // 填充
+        }
+    });
+    
+    // 玩家飞机纹理
+    textures.player = createOffscreenTexture(30, 30, (ctx) => {
+        // 飞机主体
+        ctx.fillStyle = '#0088ff'; // 蓝色
+        ctx.beginPath(); // 开始路径
+        ctx.moveTo(15, 0); // 顶点
+        ctx.lineTo(30, 30); // 右下
+        ctx.lineTo(15, 25); // 底部中点
+        ctx.lineTo(0, 30); // 左下
+        ctx.closePath(); // 闭合路径
+        ctx.fill(); // 填充
+        
+        // 飞机窗口
+        ctx.fillStyle = '#44ffff'; // 青色
+        ctx.beginPath(); // 开始路径
+        ctx.arc(15, 10, 5, 0, Math.PI * 2); // 绘制圆形
+        ctx.fill(); // 填充
+        
+        // 引擎光芒
+        ctx.fillStyle = '#ffaa00'; // 橙色
+        ctx.beginPath(); // 开始路径
+        ctx.moveTo(10, 25); // 左上
+        ctx.lineTo(15, 35); // 下方
+        ctx.lineTo(20, 25); // 右上
+        ctx.closePath(); // 闭合路径
+        ctx.fill(); // 填充
+    });
+    
+    // 基本敌机纹理
+    textures.enemy = createOffscreenTexture(30, 30, (ctx) => {
+        // 敌机主体 - 战斗机形状，头部朝下
+        ctx.fillStyle = '#cc3333'; // 红色机身
+        ctx.beginPath(); // 开始路径
+        ctx.moveTo(15, 30); // 机头（朝下）
+        ctx.lineTo(25, 20); // 右翼前沿
+        ctx.lineTo(30, 10); // 右翼延伸
+        ctx.lineTo(25, 8); // 右翼后缘
+        ctx.lineTo(20, 10); // 右机身
+        ctx.lineTo(18, 0); // 右尾翼
+        ctx.lineTo(12, 0); // 左尾翼
+        ctx.lineTo(10, 10); // 左机身
+        ctx.lineTo(5, 8); // 左翼后缘
+        ctx.lineTo(0, 10); // 左翼延伸
+        ctx.lineTo(5, 20); // 左翼前沿
+        ctx.closePath(); // 闭合路径
+        ctx.fill(); // 填充
+        
+        // 驾驶舱玻璃
+        ctx.fillStyle = '#aaddff'; // 淡蓝色
+        ctx.beginPath(); // 开始路径
+        ctx.ellipse(15, 22, 4, 6, 0, 0, Math.PI * 2); // 椭圆形玻璃罩
+        ctx.fill(); // 填充
+        
+        // 驾驶舱玻璃反光
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.6)'; // 半透明白色
+        ctx.beginPath(); // 开始路径
+        ctx.ellipse(14, 23, 2, 3, 0, 0, Math.PI * 2); // 椭圆形反光
+        ctx.fill(); // 填充
+        
+        // 机身纹路
+        ctx.strokeStyle = '#880000'; // 深红色
+        ctx.lineWidth = 0.8; // 线宽
+        
+        // 机翼
+        ctx.beginPath(); // 开始路径
+        ctx.moveTo(5, 15); // 左侧
+        ctx.lineTo(25, 15); // 右侧
+        ctx.stroke(); // 描边
+        
+        // 机尾
+        ctx.beginPath(); // 开始路径
+        ctx.moveTo(15, 10); // 下部
+        ctx.lineTo(15, 0); // 尾部
+        ctx.stroke(); // 描边
+        
+        // 引擎喷射
+        const engineGlow = ctx.createLinearGradient(15, 5, 15, -5);
+        engineGlow.addColorStop(0, '#ff6600'); // 橙色
+        engineGlow.addColorStop(1, 'rgba(255, 102, 0, 0)'); // 透明
+        
+        ctx.fillStyle = engineGlow; // 使用渐变
+        ctx.beginPath(); // 开始路径
+        ctx.moveTo(13, 0); // 左边
+        ctx.lineTo(15, -5); // 顶部
+        ctx.lineTo(17, 0); // 右边
+        ctx.closePath(); // 闭合路径
+        ctx.fill(); // 填充
+    });
+    
+    // 精英敌机纹理
+    textures.elite = createOffscreenTexture(40, 40, (ctx) => {
+        // 军用战斗机外观
+        
+        // 基础梯形机身
+        ctx.fillStyle = '#404060'; // 暗蓝灰色
+        ctx.beginPath(); // 开始路径
+        ctx.moveTo(20, 0); // 机头
+        ctx.lineTo(28, 12); // 右前机身
+        ctx.lineTo(32, 20); // 右翼连接点
+        ctx.lineTo(28, 28); // 右后机身
+        ctx.lineTo(24, 35); // 右侧尾部
+        ctx.lineTo(16, 35); // 左侧尾部
+        ctx.lineTo(12, 28); // 左后机身
+        ctx.lineTo(8, 20); // 左翼连接点
+        ctx.lineTo(12, 12); // 左前机身
+        ctx.closePath(); // 闭合路径
+        ctx.fill(); // 填充
+        
+        // 机翼 - 左
+        ctx.fillStyle = '#303050'; // 稍深一点的灰蓝色
+        ctx.beginPath(); // 开始路径
+        ctx.moveTo(8, 20); // 翼根
+        ctx.lineTo(0, 24); // 前缘尖端
+        ctx.lineTo(5, 28); // 后缘
+        ctx.lineTo(12, 28); // 与机身连接点
+        ctx.closePath(); // 闭合路径
+        ctx.fill(); // 填充
+        
+        // 机翼 - 右
+        ctx.beginPath(); // 开始路径
+        ctx.moveTo(32, 20); // 翼根
+        ctx.lineTo(40, 24); // 前缘尖端
+        ctx.lineTo(35, 28); // 后缘
+        ctx.lineTo(28, 28); // 与机身连接点
+        ctx.closePath(); // 闭合路径
+        ctx.fill(); // 填充
+        
+        // 尾翼
+        ctx.fillStyle = '#303050'; // 稍深一点的灰蓝色
+        ctx.beginPath(); // 开始路径
+        ctx.moveTo(16, 35); // 左连接点
+        ctx.lineTo(14, 40); // 左尾尖
+        ctx.lineTo(26, 40); // 右尾尖
+        ctx.lineTo(24, 35); // 右连接点
+        ctx.closePath(); // 闭合路径
+        ctx.fill(); // 填充
+        
+        // 垂直尾翼
+        ctx.beginPath(); // 开始路径
+        ctx.moveTo(20, 30); // 底部
+        ctx.lineTo(20, 22); // 顶部前
+        ctx.lineTo(24, 28); // 顶部后
+        ctx.closePath(); // 闭合路径
+        ctx.fill(); // 填充
+        
+        // 驾驶舱玻璃罩 - 高级战机使用梯形玻璃罩
+        ctx.fillStyle = '#80d0ff'; // 蓝色玻璃
+        ctx.beginPath(); // 开始路径
+        ctx.moveTo(20, 5); // 前端
+        ctx.lineTo(24, 10); // 右前
+        ctx.lineTo(24, 15); // 右后
+        ctx.lineTo(16, 15); // 左后
+        ctx.lineTo(16, 10); // 左前
+        ctx.closePath(); // 闭合路径
+        ctx.fill(); // 填充
+        
+        // 玻璃罩反光
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'; // 白色反光
+        ctx.beginPath(); // 开始路径
+        ctx.moveTo(20, 6); // 前端
+        ctx.lineTo(22, 8); // 右前
+        ctx.lineTo(22, 11); // 右后 
+        ctx.lineTo(18, 11); // 左后
+        ctx.lineTo(18, 8); // 左前
+        ctx.closePath(); // 闭合路径
+        ctx.fill(); // 填充
+        
+        // 机身细节 - 面板线
+        ctx.strokeStyle = '#aaaacc'; // 亮灰色线条
+        ctx.lineWidth = 0.5; // 细线
+        
+        // 机身线
+        ctx.beginPath(); // 开始路径
+        ctx.moveTo(20, 15); // 驾驶舱后
+        ctx.lineTo(20, 30); // 尾部前
+        ctx.stroke(); // 描边
+        
+        // 机翼线
+        ctx.beginPath(); // 开始路径
+        ctx.moveTo(3, 25); // 左翼
+        ctx.lineTo(37, 25); // 右翼
+        ctx.stroke(); // 描边
+        
+        // 引擎喷射 - 制作双引擎效果
+        const engineGlow = ctx.createLinearGradient(20, 35, 20, 45);
+        engineGlow.addColorStop(0, '#4488ff'); // 蓝色
+        engineGlow.addColorStop(0.3, '#00ddff'); // 青色
+        engineGlow.addColorStop(1, 'rgba(0, 153, 255, 0)'); // 透明
+        
+        // 左引擎
+        ctx.fillStyle = engineGlow; // 使用渐变
+        ctx.beginPath(); // 开始路径
+        ctx.moveTo(17, 40); // 左边
+        ctx.lineTo(16, 45); // 底部
+        ctx.lineTo(19, 40); // 右边
+        ctx.closePath(); // 闭合路径
+        ctx.fill(); // 填充
+        
+        // 右引擎
+        ctx.beginPath(); // 开始路径
+        ctx.moveTo(21, 40); // 左边
+        ctx.lineTo(24, 45); // 底部
+        ctx.lineTo(23, 40); // 右边
+        ctx.closePath(); // 闭合路径
+        ctx.fill(); // 填充
+        
+        // 武器挂点
+        ctx.fillStyle = '#252540'; // 深灰色
+        
+        // 左武器
+        ctx.beginPath(); // 开始路径
+        ctx.rect(6, 22, 6, 2); // 左侧武器舱
+        ctx.fill(); // 填充
+        
+        // 右武器
+        ctx.beginPath(); // 开始路径
+        ctx.rect(28, 22, 6, 2); // 右侧武器舱
         ctx.fill(); // 填充
         
         // 中央武器
         ctx.beginPath(); // 开始路径
-        ctx.rect(19, 25, 2, 5); // 中央机炮
+        ctx.rect(19, 15, 2, 5); // 中央机炮
         ctx.fill(); // 填充
     });
     

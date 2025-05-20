@@ -20,6 +20,7 @@
 - Cursor
 - HTML5
 - CSS
+- JavaScript (Phaser.js)
 
 
 ## 游戏演示

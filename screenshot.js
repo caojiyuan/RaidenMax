@@ -330,7 +330,7 @@ function generateScreenshot() {
     ctx.fillStyle = '#f7d100'; // 金色
     ctx.font = 'bold 48px Arial'; // 字体
     ctx.textAlign = 'center'; // 居中对齐
-    ctx.fillText('火力全开', canvas.width / 2, canvas.height / 2); // 游戏标题
+    ctx.fillText('雷电MAX', canvas.width / 2, canvas.height / 2); // 游戏标题
     
     ctx.font = '24px Arial'; // 字体
     ctx.fillStyle = '#ffffff'; // 白色
