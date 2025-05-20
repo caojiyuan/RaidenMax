@@ -6,7 +6,59 @@
     <title>雷电MAX - 飞机射击游戏</title> <!-- 设置页面标题 -->
     <link rel="stylesheet" href="style.css"> <!-- 引入CSS样式文件 -->
     <link rel="icon" href="favicon.ico" type="image/x-icon"> <!-- 添加网站图标 -->
-    <script src="assets/js/phaser.min.js"></script> <!-- 引入本地Phaser.js库 -->
+    
+    <!-- 添加Phaser库加载事件处理 -->
+    <script>
+        // 定义全局加载状态追踪变量
+        window.gameLoadingStatus = {
+            phaserLoaded: false,
+            error: null
+        };
+        
+        // 定义加载错误处理函数
+        function handleScriptError(error) {
+            console.error('Phaser加载失败:', error);
+            window.gameLoadingStatus.error = '库加载失败';
+            
+            // 如果游戏已经在尝试初始化，通知游戏代码
+            if (window.updateLoadingStatus) {
+                window.updateLoadingStatus('phaser', false, 'Phaser库加载失败: ' + error);
+            }
+        }
+        
+        // 定义加载成功处理函数
+        function handleScriptLoad() {
+            console.log('Phaser加载成功');
+            window.gameLoadingStatus.phaserLoaded = true;
+            
+            // 如果游戏已经在尝试初始化，通知游戏代码
+            if (window.updateLoadingStatus) {
+                window.updateLoadingStatus('phaser', true, 'Phaser库加载成功');
+            }
+        }
+    </script>
+    
+    <!-- 使用事件监听方式加载本地Phaser.js -->
+    <script src="assets/js/phaser.min.js" 
+            onload="handleScriptLoad()" 
+            onerror="handleScriptError('无法加载文件')"></script>
+    
+    <!-- 如果本地文件加载失败，从CDN加载 -->
+    <script>
+        // 如果5秒后Phaser仍未加载，尝试从CDN加载
+        setTimeout(function() {
+            if (!window.gameLoadingStatus.phaserLoaded && !window.Phaser) {
+                console.log('本地Phaser加载失败，尝试从CDN加载');
+                var cdnScript = document.createElement('script');
+                cdnScript.src = 'https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js';
+                cdnScript.onload = handleScriptLoad;
+                cdnScript.onerror = function() {
+                    handleScriptError('CDN加载也失败');
+                };
+                document.head.appendChild(cdnScript);
+            }
+        }, 5000);
+    </script>
 </head>
 <body>
     <div class="container">
@@ -14,6 +66,20 @@
             <h1>雷电MAX</h1>
             <p class="controls-hint">使用方向键移动飞机，自动射击</p>
         </div>
+        
+        <!-- 加载状态指示器 -->
+        <div id="loading-indicator" class="loading-indicator">
+            <div class="loading-text">游戏加载中...</div>
+            <div class="loading-progress-container">
+                <div id="loading-progress-bar" class="loading-progress-bar"></div>
+            </div>
+            <div id="loading-status" class="loading-status">初始化中...</div>
+            <div class="loading-debug">
+                <button id="force-continue" class="force-continue-btn">强制继续 (调试)</button>
+                <div id="loading-log" class="loading-log"></div>
+            </div>
+        </div>
+        
         <div id="game-container"></div> <!-- 游戏容器 -->
         <div id="mobile-controls" class="mobile-controls">
             <div id="joystick-area" class="joystick-area">

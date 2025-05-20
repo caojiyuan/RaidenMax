@@ -67,8 +67,130 @@ const WEAPON_CONFIGS = {
     }
 };
 
+// 加载状态变量
+let loadingStatus = {
+    phaser: false, // Phaser库加载状态
+    textures: false, // 纹理加载状态
+    initialized: false, // 初始化状态
+    progress: 0, // 加载进度
+    messages: [], // 加载消息
+    startTime: 0, // 开始加载时间
+    timeout: 10000 // 超时时间 (10秒)
+};
+
+// 暴露更新加载状态函数到全局作用域，以便其他脚本调用
+window.updateLoadingStatus = updateLoadingStatus;
+
+// 更新加载状态
+function updateLoadingStatus(component, status, message) {
+    // 更新组件状态
+    if (component) {
+        loadingStatus[component] = status;
+    }
+    
+    // 添加消息到日志
+    if (message) {
+        const timestamp = new Date().toLocaleTimeString();
+        const logMessage = `[${timestamp}] ${message}`;
+        loadingStatus.messages.push(logMessage);
+        
+        // 更新状态文本
+        const statusElement = document.getElementById('loading-status');
+        if (statusElement) {
+            statusElement.textContent = message;
+        }
+        
+        // 更新日志显示
+        const logElement = document.getElementById('loading-log');
+        if (logElement) {
+            logElement.innerHTML += logMessage + '<br>';
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+    }
+    
+    // 计算总进度
+    let totalProgress = 0;
+    
+    // Phaser库加载权重30%
+    if (loadingStatus.phaser) totalProgress += 30;
+    
+    // 纹理加载权重40%
+    if (loadingStatus.textures) totalProgress += 40;
+    
+    // 初始化权重30%
+    if (loadingStatus.initialized) totalProgress += 30;
+    
+    // 更新进度条
+    loadingStatus.progress = totalProgress;
+    const progressBar = document.getElementById('loading-progress-bar');
+    if (progressBar) {
+        progressBar.style.width = totalProgress + '%';
+    }
+    
+    // 检查是否超时
+    const currentTime = Date.now();
+    if (loadingStatus.startTime && (currentTime - loadingStatus.startTime > loadingStatus.timeout)) {
+        // 显示调试按钮
+        const forceButton = document.getElementById('force-continue');
+        if (forceButton) {
+            forceButton.style.display = 'block';
+        }
+        
+        const logElement = document.getElementById('loading-log');
+        if (logElement) {
+            logElement.style.display = 'block';
+        }
+        
+        // 更新状态文本
+        const statusElement = document.getElementById('loading-status');
+        if (statusElement) {
+            statusElement.textContent = "加载超时，请检查控制台或点击强制继续";
+            statusElement.style.color = '#ff5555';
+        }
+        
+        // 重置超时检查，避免重复触发
+        loadingStatus.startTime = 0;
+    }
+    
+    // 如果全部加载完成，隐藏加载指示器
+    if (totalProgress >= 100) {
+        const loadingIndicator = document.getElementById('loading-indicator');
+        if (loadingIndicator) {
+            // 延迟一秒隐藏，让用户看到100%
+            setTimeout(() => {
+                loadingIndicator.style.display = 'none';
+            }, 1000);
+        }
+    }
+}
+
+// 强制继续游戏
+function forceContinueGame() {
+    // 更新所有状态为完成
+    loadingStatus.phaser = true;
+    loadingStatus.textures = true;
+    loadingStatus.initialized = true;
+    
+    // 更新进度条
+    updateLoadingStatus(null, null, "强制继续游戏...");
+    
+    // 隐藏加载指示器
+    const loadingIndicator = document.getElementById('loading-indicator');
+    if (loadingIndicator) {
+        loadingIndicator.style.display = 'none';
+    }
+    
+    // 如果游戏已经初始化，不要重复初始化
+    if (!gameLoopId) {
+        // 尝试继续初始化游戏
+        init();
+    }
+}
+
 // 创建游戏纹理
 function createTextures() {
+    updateLoadingStatus(null, null, "创建游戏纹理...");
+    
     // 创建离屏画布来生成纹理
     const createOffscreenTexture = (width, height, callback) => {
         const offCanvas = document.createElement('canvas'); // 创建离屏画布
@@ -80,6 +202,7 @@ function createTextures() {
     };
     
     // 背景纹理
+    updateLoadingStatus(null, null, "创建背景纹理...");
     textures.background = createOffscreenTexture(GAME_WIDTH, GAME_HEIGHT, (ctx) => {
         // 深色背景
         ctx.fillStyle = '#000'; // 黑色背景
@@ -109,6 +232,7 @@ function createTextures() {
     });
     
     // 玩家飞机纹理
+    updateLoadingStatus(null, null, "创建玩家飞机纹理...");
     textures.player = createOffscreenTexture(30, 30, (ctx) => {
         // 飞机主体
         ctx.fillStyle = '#0088ff'; // 蓝色
@@ -810,6 +934,9 @@ function createTextures() {
         ctx.arc(10, 10, 9, 0, Math.PI * 2); // 绘制圆形
         ctx.stroke(); // 描边
     });
+    
+    // 所有纹理创建完成
+    updateLoadingStatus('textures', true, "所有纹理创建完成");
 }
 
 // 设置键盘输入
@@ -859,10 +986,46 @@ function setupInput() {
 
 // 游戏初始化
 function init() {
+    updateLoadingStatus(null, null, "初始化游戏...");
+    
+    // 检查Phaser库是否加载
+    if (window.Phaser) {
+        updateLoadingStatus('phaser', true, "Phaser库已加载");
+    } else {
+        // 检查全局加载状态
+        if (window.gameLoadingStatus) {
+            if (window.gameLoadingStatus.phaserLoaded) {
+                updateLoadingStatus('phaser', true, "Phaser库已加载 (通过全局状态确认)");
+            } else if (window.gameLoadingStatus.error) {
+                updateLoadingStatus('phaser', false, "Phaser库加载失败: " + window.gameLoadingStatus.error);
+                
+                // 显示调试按钮和日志
+                const forceButton = document.getElementById('force-continue');
+                if (forceButton) {
+                    forceButton.style.display = 'block';
+                }
+                
+                const logElement = document.getElementById('loading-log');
+                if (logElement) {
+                    logElement.style.display = 'block';
+                }
+                
+                // 我们仍然可以尝试继续
+                updateLoadingStatus(null, null, "尝试在没有Phaser库的情况下继续...");
+            } else {
+                updateLoadingStatus(null, null, "Phaser库状态未知，尝试继续...");
+            }
+        } else {
+            updateLoadingStatus(null, null, "警告: Phaser库未加载，尝试继续...");
+        }
+    }
+    
     // 检测是否为移动设备
+    updateLoadingStatus(null, null, "检测设备类型...");
     checkDeviceType();
     
     // 创建画布
+    updateLoadingStatus(null, null, "创建游戏画布...");
     canvas = document.createElement('canvas'); // 创建画布元素
     canvas.width = GAME_WIDTH; // 设置宽度
     canvas.height = GAME_HEIGHT; // 设置高度
@@ -880,6 +1043,7 @@ function init() {
     createTextures();
     
     // 创建玩家
+    updateLoadingStatus(null, null, "创建玩家角色...");
     player = {
         x: GAME_WIDTH / 2, // X坐标
         y: GAME_HEIGHT - 100, // Y坐标
@@ -895,10 +1059,12 @@ function init() {
     };
     
     // 设置键盘事件
+    updateLoadingStatus(null, null, "设置输入控制...");
     setupInput();
     
     // 设置移动设备触摸控制
     if (isMobile) {
+        updateLoadingStatus(null, null, "设置触摸控制...");
         setupTouchControls();
         
         // 更新控制提示文本
@@ -912,16 +1078,21 @@ function init() {
     }
     
     // 适配游戏尺寸
+    updateLoadingStatus(null, null, "调整游戏尺寸...");
     resizeGame();
     
     // 添加窗口大小改变事件监听
     window.addEventListener('resize', resizeGame);
     
+    // 标记初始化完成
+    updateLoadingStatus('initialized', true, "游戏初始化完成");
+    
+    // 开始第一关
+    updateLoadingStatus(null, null, "开始游戏...");
+    startLevel(currentLevel);
+    
     // 使用requestAnimationFrame启动游戏循环
     gameLoopId = requestAnimationFrame(gameLoop);
-    
-    // 设置敌机生成
-    startLevel(currentLevel);
 }
 
 // 阻止页面滑动
@@ -2755,4 +2926,17 @@ function drawUI() {
 }
 
 // 当页面加载完成，初始化游戏
-window.onload = init; 
+window.onload = function() {
+    // 设置初始加载状态
+    loadingStatus.startTime = Date.now();
+    updateLoadingStatus(null, null, "页面加载完成，准备初始化游戏...");
+    
+    // 绑定强制继续按钮事件
+    const forceButton = document.getElementById('force-continue');
+    if (forceButton) {
+        forceButton.addEventListener('click', forceContinueGame);
+    }
+    
+    // 延迟一下，让加载状态显示出来
+    setTimeout(init, 500);
+}; 
