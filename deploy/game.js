@@ -38,6 +38,13 @@ let mobileSetting = { // 移动设备设置
     lowGraphics: false, // 是否启用低画质模式
     fps: 60 // 帧率
 };
+let debugInfo = { // 调试信息
+    isMobileDetected: false, // 是否检测到移动设备
+    touchEventsSupported: false, // 是否支持触摸事件
+    joystickActive: false, // 摇杆是否激活
+    lastTouchPos: {x: 0, y: 0}, // 最后触摸位置
+    lastJoystickVector: {x: 0, y: 0} // 最后摇杆向量
+};
 
 // 武器等级配置
 const WEAPON_CONFIGS = {
@@ -1034,6 +1041,10 @@ function init() {
     // 将画布添加到容器
     const container = document.getElementById('game-container'); // 获取容器
     if (container) {
+        // 确保容器没有其他内容
+        while (container.firstChild) {
+            container.removeChild(container.firstChild);
+        }
         container.appendChild(canvas); // 添加画布到容器
     } else {
         document.body.appendChild(canvas); // 添加到body
@@ -1062,19 +1073,60 @@ function init() {
     updateLoadingStatus(null, null, "设置输入控制...");
     setupInput();
     
+    // 移动设备设置
+    const mobileControls = document.getElementById('mobile-controls');
+    const mobileHint = document.querySelector('.mobile-hint');
+    const controlsHint = document.querySelector('.controls-hint');
+    
+    // 先隐藏所有控制相关提示和元素
+    if (mobileControls) mobileControls.style.display = 'none';
+    if (mobileHint) mobileHint.style.display = 'none';
+    if (controlsHint) controlsHint.style.display = 'none';
+    
     // 设置移动设备触摸控制
     if (isMobile) {
         updateLoadingStatus(null, null, "设置触摸控制...");
+        
+        // 显示移动控制元素
+        if (mobileControls) {
+            mobileControls.style.display = 'block';
+            console.log("已显示移动控制元素");
+        } else {
+            console.error("找不到移动控制元素");
+        }
+        
+        // 初始化触摸控制
         setupTouchControls();
         
         // 更新控制提示文本
-        const controlsHint = document.querySelector('.controls-hint');
         if (controlsHint) {
             controlsHint.textContent = '使用虚拟摇杆移动飞机，自动射击';
+            controlsHint.style.display = 'none'; // 隐藏键盘提示
+        }
+        
+        // 显示移动提示
+        if (mobileHint) {
+            mobileHint.style.display = 'block';
         }
         
         // 阻止页面滑动
         preventPageScroll();
+    } else {
+        // 桌面设备
+        // 隐藏移动提示
+        if (mobileHint) {
+            mobileHint.style.display = 'none';
+        }
+        
+        // 显示键盘提示
+        if (controlsHint) {
+            controlsHint.style.display = 'block';
+        }
+        
+        // 隐藏移动控制器
+        if (mobileControls) {
+            mobileControls.style.display = 'none';
+        }
     }
     
     // 适配游戏尺寸
@@ -1097,8 +1149,14 @@ function init() {
 
 // 阻止页面滑动
 function preventPageScroll() {
+    console.log("设置防止页面滑动");
+    
     // 阻止整个页面的默认滑动行为
     document.addEventListener('touchmove', function(e) {
+        // 允许开发者工具等UI组件的滚动
+        if (e.target.classList.contains('scrollable')) {
+            return;
+        }
         e.preventDefault();
     }, { passive: false });
     
@@ -1108,12 +1166,27 @@ function preventPageScroll() {
         gameContainer.addEventListener('touchmove', function(e) {
             e.preventDefault();
         }, { passive: false });
+        
+        // 防止缩放
+        gameContainer.addEventListener('gesturestart', function(e) {
+            e.preventDefault();
+        }, { passive: false });
+        
+        gameContainer.addEventListener('gesturechange', function(e) {
+            e.preventDefault();
+        }, { passive: false });
+        
+        gameContainer.addEventListener('gestureend', function(e) {
+            e.preventDefault();
+        }, { passive: false });
     }
     
     // 阻止画布的默认滑动行为
-    canvas.addEventListener('touchmove', function(e) {
-        e.preventDefault();
-    }, { passive: false });
+    if (canvas) {
+        canvas.addEventListener('touchmove', function(e) {
+            e.preventDefault();
+        }, { passive: false });
+    }
     
     // 阻止控制区域的默认滑动行为
     const mobileControls = document.getElementById('mobile-controls');
@@ -1122,23 +1195,50 @@ function preventPageScroll() {
             e.preventDefault();
         }, { passive: false });
     }
+    
+    // 添加meta标签防止缩放
+    let meta = document.querySelector('meta[name="viewport"]');
+    if (!meta) {
+        meta = document.createElement('meta');
+        meta.name = 'viewport';
+        document.head.appendChild(meta);
+    }
+    meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
+    
+    // 添加触摸事件调试信息
+    document.body.addEventListener('touchstart', function(e) {
+        console.log('触摸事件:', e.touches.length, '个触摸点');
+    }, { passive: true });
+    
+    console.log("防止页面滑动设置完成");
 }
 
 // 检测设备类型
 function checkDeviceType() {
     // 检查是否为移动设备
     const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-    isMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase());
+    const userAgentMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase());
     
     // 如果不是通过用户代理检测到的，检查触摸功能
-    if (!isMobile) {
-        isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-    }
+    const touchSupported = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
     
     // 如果屏幕宽度小于850，也视为移动设备
-    if (!isMobile) {
-        isMobile = window.innerWidth <= 850;
-    }
+    const smallScreen = window.innerWidth <= 850;
+    
+    // 保存调试信息
+    debugInfo.userAgentMobile = userAgentMobile;
+    debugInfo.touchSupported = touchSupported;
+    debugInfo.smallScreen = smallScreen;
+    
+    // 任何一种情况视为移动设备
+    isMobile = userAgentMobile || touchSupported || smallScreen;
+    debugInfo.isMobileDetected = isMobile;
+    
+    // 在控制台输出检测结果
+    console.log("移动设备检测结果:", isMobile);
+    console.log("- 用户代理检测:", userAgentMobile);
+    console.log("- 触摸功能检测:", touchSupported);
+    console.log("- 屏幕尺寸检测:", smallScreen, window.innerWidth);
 }
 
 // 设置触摸控制
@@ -1147,35 +1247,98 @@ function setupTouchControls() {
     const joystickBase = document.getElementById('joystick-base');
     const joystickThumb = document.getElementById('joystick-thumb');
     const joystickArea = document.getElementById('joystick-area');
+    const mobileControls = document.getElementById('mobile-controls');
     
-    if (!joystickBase || !joystickThumb || !joystickArea) return;
+    // 检查元素是否存在
+    if (!joystickBase || !joystickThumb || !joystickArea || !mobileControls) {
+        console.error("触摸控制元素未找到:", {
+            joystickBase: !!joystickBase,
+            joystickThumb: !!joystickThumb,
+            joystickArea: !!joystickArea,
+            mobileControls: !!mobileControls
+        });
+        return;
+    }
     
-    // 获取摇杆基座的位置和尺寸
-    const baseRect = joystickBase.getBoundingClientRect();
-    joystickPosition = {
-        x: baseRect.left + baseRect.width / 2,
-        y: baseRect.top + baseRect.height / 2
-    };
+    // 确保移动控制显示并设置样式
+    mobileControls.style.display = 'block';
+    mobileControls.style.position = 'absolute';
+    mobileControls.style.top = '0';
+    mobileControls.style.left = '0';
+    mobileControls.style.width = '100%';
+    mobileControls.style.height = '100%';
+    mobileControls.style.zIndex = '1000';
+    mobileControls.style.pointerEvents = 'auto';
     
-    // 初始化手柄位置
-    joystickThumbPosition = { x: joystickPosition.x, y: joystickPosition.y };
+    joystickArea.style.width = '100%';
+    joystickArea.style.height = '100%';
+    joystickArea.style.position = 'relative';
+    joystickArea.style.pointerEvents = 'auto';
+    
+    // 输出元素尺寸以便调试
+    console.log("控制元素尺寸:", {
+        mobileControls: {
+            width: mobileControls.clientWidth,
+            height: mobileControls.clientHeight
+        },
+        joystickArea: {
+            width: joystickArea.clientWidth,
+            height: joystickArea.clientHeight
+        }
+    });
+    
+    // 初始化向量
     joystickVector = { x: 0, y: 0 };
     
-    // 触摸开始事件
-    joystickArea.addEventListener('touchstart', function(e) {
-        if (touchId !== null) return; // 已有触摸进行中
+    // 清除之前的事件监听器(避免重复)
+    // 触摸开始事件 - 先移除
+    joystickArea.removeEventListener('touchstart', handleTouchStart);
+    document.removeEventListener('touchmove', handleTouchMove);
+    document.removeEventListener('touchend', handleTouchEnd);
+    document.removeEventListener('touchcancel', handleTouchEnd);
+    
+    // 添加直接触摸事件处理函数
+    function handleTouchStart(e) {
+        console.log("触摸开始事件触发");
+        if (touchId !== null) {
+            console.log("已有触摸进行中，忽略");
+            return; // 已有触摸进行中
+        }
         
         e.preventDefault();
         const touch = e.changedTouches[0];
         touchId = touch.identifier;
         
+        // 在触摸位置显示摇杆
+        const touchX = touch.clientX;
+        const touchY = touch.clientY;
+        
+        // 更新调试信息
+        debugInfo.lastTouchPos = {x: touchX, y: touchY};
+        console.log("触摸位置:", touchX, touchY);
+        
+        // 显示并定位摇杆基座到触摸位置
+        joystickBase.style.display = 'flex';
+        joystickBase.style.left = (touchX - joystickBase.clientWidth / 2) + 'px';
+        joystickBase.style.top = (touchY - joystickBase.clientHeight / 2) + 'px';
+        
+        // 显示并定位摇杆手柄到基座中心
+        joystickThumb.style.display = 'block';
+        joystickThumb.style.left = (touchX - joystickThumb.clientWidth / 2) + 'px';
+        joystickThumb.style.top = (touchY - joystickThumb.clientHeight / 2) + 'px';
+        
+        // 更新摇杆位置变量
+        joystickPosition = { x: touchX, y: touchY };
+        joystickThumbPosition = { x: touchX, y: touchY };
+        
         isJoystickActive = true;
-        updateJoystickPosition(touch.clientX, touch.clientY);
-    });
+        debugInfo.joystickActive = true;
+    }
     
-    // 触摸移动事件
-    window.addEventListener('touchmove', function(e) {
-        if (!isJoystickActive) return;
+    function handleTouchMove(e) {
+        if (!isJoystickActive) {
+            return;
+        }
         
         e.preventDefault();
         
@@ -1183,80 +1346,104 @@ function setupTouchControls() {
         for (let i = 0; i < e.changedTouches.length; i++) {
             const touch = e.changedTouches[i];
             if (touch.identifier === touchId) {
+                console.log("触摸移动:", touch.clientX, touch.clientY);
                 updateJoystickPosition(touch.clientX, touch.clientY);
                 break;
             }
         }
-    });
+    }
     
-    // 触摸结束事件
-    window.addEventListener('touchend', function(e) {
+    function handleTouchEnd(e) {
         // 查找对应ID的触摸点
         for (let i = 0; i < e.changedTouches.length; i++) {
             const touch = e.changedTouches[i];
             if (touch.identifier === touchId) {
+                console.log("触摸结束");
                 resetJoystick();
                 touchId = null;
+                debugInfo.joystickActive = false;
                 break;
             }
         }
-    });
+    }
     
-    // 触摸取消事件
-    window.addEventListener('touchcancel', function(e) {
-        // 查找对应ID的触摸点
-        for (let i = 0; i < e.changedTouches.length; i++) {
-            const touch = e.changedTouches[i];
-            if (touch.identifier === touchId) {
-                resetJoystick();
-                touchId = null;
-                break;
+    // 重新添加事件监听器
+    joystickArea.addEventListener('touchstart', handleTouchStart, { passive: false });
+    document.addEventListener('touchmove', handleTouchMove, { passive: false });
+    document.addEventListener('touchend', handleTouchEnd);
+    document.addEventListener('touchcancel', handleTouchEnd);
+    
+    // 直接给游戏容器也添加触摸事件处理
+    const gameContainer = document.getElementById('game-container');
+    if (gameContainer) {
+        gameContainer.addEventListener('touchstart', function(e) {
+            console.log("游戏容器触摸:", e.touches.length);
+            // 将事件传递给joystickArea
+            const rect = joystickArea.getBoundingClientRect();
+            if (e.touches[0].clientX >= rect.left && 
+                e.touches[0].clientX <= rect.right &&
+                e.touches[0].clientY >= rect.top && 
+                e.touches[0].clientY <= rect.bottom) {
+                handleTouchStart(e);
             }
-        }
-    });
+        }, {passive: false});
+    }
+    
+    // 添加调试提示
+    console.log("触摸控制重新初始化完成，使用新的事件处理方法");
 }
 
 // 更新摇杆位置
 function updateJoystickPosition(touchX, touchY) {
+    // 获取元素
     const joystickBase = document.getElementById('joystick-base');
     const joystickThumb = document.getElementById('joystick-thumb');
     
-    if (!joystickBase || !joystickThumb) return;
+    if (!joystickBase || !joystickThumb) {
+        console.error("无法找到摇杆元素");
+        return;
+    }
     
     // 获取基座位置和尺寸
     const baseRect = joystickBase.getBoundingClientRect();
-    const centerX = baseRect.left + baseRect.width / 2;
-    const centerY = baseRect.top + baseRect.height / 2;
+    const baseX = baseRect.left + baseRect.width / 2;
+    const baseY = baseRect.top + baseRect.height / 2;
     
-    // 计算触摸点与基座中心的距离
-    const deltaX = touchX - centerX;
-    const deltaY = touchY - centerY;
+    // 计算触摸点和基座中心的距离
+    const deltaX = touchX - baseX;
+    const deltaY = touchY - baseY;
     const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
     
-    // 限制手柄移动距离
-    const maxDistance = baseRect.width / 2;
-    const limitedDistance = Math.min(distance, maxDistance);
+    // 计算摇杆的最大移动半径（基座半径的70%）
+    const maxRadius = baseRect.width * 0.35;
     
-    // 计算手柄位置
-    let thumbX, thumbY;
-    if (distance > 0) {
-        const ratio = limitedDistance / distance;
-        thumbX = centerX + deltaX * ratio;
-        thumbY = centerY + deltaY * ratio;
+    // 限制摇杆移动范围
+    let limitedX, limitedY;
+    if (distance > maxRadius) {
+        // 超出最大半径，沿着同一方向缩放到最大半径
+        const ratio = maxRadius / distance;
+        limitedX = baseX + deltaX * ratio;
+        limitedY = baseY + deltaY * ratio;
     } else {
-        thumbX = centerX;
-        thumbY = centerY;
+        // 在最大半径内，使用实际触摸位置
+        limitedX = touchX;
+        limitedY = touchY;
     }
     
-    // 更新手柄位置
-    joystickThumb.style.left = (thumbX - joystickThumb.clientWidth / 2) + 'px';
-    joystickThumb.style.top = (thumbY - joystickThumb.clientHeight / 2) + 'px';
+    // 更新摇杆手柄位置
+    joystickThumb.style.left = (limitedX - joystickThumb.clientWidth / 2) + 'px';
+    joystickThumb.style.top = (limitedY - joystickThumb.clientHeight / 2) + 'px';
     
-    // 计算摇杆向量（-1到1之间）
-    joystickVector = {
-        x: limitedDistance > 0 ? deltaX / maxDistance : 0,
-        y: limitedDistance > 0 ? deltaY / maxDistance : 0
-    };
+    // 更新摇杆向量（归一化，用于控制移动）
+    // 将移动范围从-maxRadius~maxRadius归一化到-1~1
+    joystickVector.x = (limitedX - baseX) / maxRadius;
+    joystickVector.y = (limitedY - baseY) / maxRadius;
+    
+    // 存储当前位置，用于后续计算
+    joystickThumbPosition = { x: limitedX, y: limitedY };
+    
+    // 更新调试信息
+    debugInfo.lastJoystickVector = {x: joystickVector.x, y: joystickVector.y};
 }
 
 // 重置摇杆位置
@@ -1266,14 +1453,9 @@ function resetJoystick() {
     
     if (!joystickBase || !joystickThumb) return;
     
-    // 获取基座位置
-    const baseRect = joystickBase.getBoundingClientRect();
-    const centerX = baseRect.left + baseRect.width / 2;
-    const centerY = baseRect.top + baseRect.height / 2;
-    
-    // 重置手柄位置到中心
-    joystickThumb.style.left = (centerX - joystickThumb.clientWidth / 2) + 'px';
-    joystickThumb.style.top = (centerY - joystickThumb.clientHeight / 2) + 'px';
+    // 隐藏摇杆组件
+    joystickBase.style.display = 'none';
+    joystickThumb.style.display = 'none';
     
     // 重置摇杆向量
     joystickVector = { x: 0, y: 0 };
@@ -1439,15 +1621,30 @@ function gameLoop(timestamp) {
     // 渲染画面
     render();
     
+    // 添加调试信息渲染
+    if (isMobile) {
+        renderDebugInfo();
+    }
+    
     // 继续请求下一帧
     gameLoopId = requestAnimationFrame(gameLoop);
 }
 
 // 使用摇杆更新玩家位置
 function updatePlayerWithJoystick() {
-    // 计算移动距离
-    const dx = joystickVector.x * player.speed;
-    const dy = joystickVector.y * player.speed;
+    // 如果摇杆不活跃，不进行更新
+    if (!isJoystickActive || !joystickVector) {
+        return;
+    }
+    
+    // 输出调试信息
+    if (Date.now() % 300 < 10) { // 每300ms输出一次，避免日志太多
+        console.log("摇杆向量:", joystickVector.x.toFixed(2), joystickVector.y.toFixed(2));
+    }
+    
+    // 计算移动距离，使用非线性映射提高控制精度
+    let dx = Math.pow(Math.abs(joystickVector.x), 1.5) * Math.sign(joystickVector.x) * player.speed;
+    let dy = Math.pow(Math.abs(joystickVector.y), 1.5) * Math.sign(joystickVector.y) * player.speed;
     
     // 更新玩家位置
     let newX = player.x + dx;
@@ -2923,6 +3120,27 @@ function drawUI() {
     if (bossActive) {
         ctx.fillText(`BOSS战斗中`, GAME_WIDTH - 10, 60); // 绘制BOSS提示
     }
+}
+
+// 渲染调试信息
+function renderDebugInfo() {
+    if (!ctx) return;
+    
+    // 设置调试面板样式
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+    ctx.fillRect(10, 100, 230, 140);
+    
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '12px Arial';
+    ctx.textAlign = 'left';
+    
+    // 显示调试信息
+    ctx.fillText(`移动设备: ${debugInfo.isMobileDetected}`, 20, 120);
+    ctx.fillText(`用户代理: ${debugInfo.userAgentMobile}`, 20, 140);
+    ctx.fillText(`触摸支持: ${debugInfo.touchSupported}`, 20, 160);
+    ctx.fillText(`屏幕尺寸: ${window.innerWidth}x${window.innerHeight}`, 20, 180);
+    ctx.fillText(`摇杆激活: ${debugInfo.joystickActive}`, 20, 200);
+    ctx.fillText(`摇杆向量: x:${debugInfo.lastJoystickVector.x.toFixed(2)}, y:${debugInfo.lastJoystickVector.y.toFixed(2)}`, 20, 220);
 }
 
 // 当页面加载完成，初始化游戏

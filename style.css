@@ -107,17 +107,21 @@ body::before {
 
 /* 触摸控制样式 */
 .mobile-controls {
-    display: none; /* 默认隐藏 */
+    display: none; /* 默认隐藏，通过JS动态控制 */
     position: absolute; /* 绝对定位 */
-    bottom: 20px; /* 距底部距离 */
-    left: 20px; /* 距左侧距离 */
+    top: 0; /* 从顶部开始 */
+    left: 0; /* 从左侧开始 */
+    width: 100%; /* 宽度100% */
+    height: 100%; /* 高度100% */
     z-index: 100; /* 确保在上层 */
+    pointer-events: none; /* 默认不拦截点击 */
 }
 
 .joystick-area {
-    width: 120px; /* 摇杆区域宽度 */
-    height: 120px; /* 摇杆区域高度 */
+    width: 100%; /* 覆盖整个区域 */
+    height: 100%; /* 覆盖整个区域 */
     position: relative; /* 相对定位 */
+    pointer-events: auto; /* 启用触摸事件 */
 }
 
 .joystick-base {
@@ -126,9 +130,7 @@ body::before {
     background-color: rgba(255, 255, 255, 0.2); /* 半透明白色 */
     border-radius: 50%; /* 圆形 */
     position: absolute; /* 绝对定位 */
-    left: 20px; /* 左侧位置 */
-    top: 20px; /* 顶部位置 */
-    display: flex; /* 弹性布局 */
+    display: none; /* 默认隐藏，动态显示 */
     justify-content: center; /* 水平居中 */
     align-items: center; /* 垂直居中 */
     border: 1px solid rgba(255, 255, 255, 0.3); /* 边框 */
@@ -141,6 +143,7 @@ body::before {
     border-radius: 50%; /* 圆形 */
     position: absolute; /* 绝对定位 */
     border: 1px solid rgba(255, 255, 255, 0.8); /* 边框 */
+    display: none; /* 默认隐藏，动态显示 */
 }
 
 /* 响应式设计 */
@@ -155,9 +158,18 @@ body::before {
         font-size: 2rem; /* 较小字号 */
     }
     
-    .mobile-controls {
-        display: block; /* 在移动设备上显示控制器 */
+    /* 以下控制由JavaScript管理，不再在CSS中自动设置 */
+    /* .mobile-controls {
+        display: block;
     }
+    
+    .controls-hint {
+        display: none;
+    }
+    
+    .mobile-hint {
+        display: block;
+    } */
 }
 
 /* 针对小屏幕设备的额外调整 */
@@ -180,16 +192,9 @@ body::before {
         font-size: 0.8rem; /* 更小的字号 */
     }
     
-    .joystick-area {
-        width: 100px; /* 更小的摇杆区域 */
-        height: 100px; /* 更小的摇杆区域 */
-    }
-    
     .joystick-base {
         width: 70px; /* 更小的摇杆基座 */
         height: 70px; /* 更小的摇杆基座 */
-        left: 15px; /* 调整位置 */
-        top: 15px; /* 调整位置 */
     }
     
     .joystick-thumb {
@@ -225,14 +230,11 @@ body::before {
     }
     
     .mobile-controls {
-        position: relative; /* 相对定位 */
-        bottom: auto; /* 移除底部定位 */
-        left: auto; /* 移除左侧定位 */
-        display: flex; /* 弹性布局 */
-        align-items: center; /* 垂直居中 */
-        justify-content: center; /* 水平居中 */
-        margin: 0 10px; /* 添加外边距 */
-        width: 30%; /* 设置宽度 */
+        width: 100%; /* 宽度100% */
+        height: 100%; /* 高度100% */
+        position: absolute; /* 绝对定位 */
+        top: 0; /* 顶部对齐 */
+        left: 0; /* 左侧对齐 */
     }
 }
 
@@ -341,4 +343,12 @@ canvas {
     background-color: rgba(0, 0, 0, 0.5); /* 半透明黑色背景 */
     border-radius: 5px; /* 圆角 */
     display: none; /* 默认隐藏 */
+}
+
+.mobile-hint {
+    display: none; /* 默认隐藏，通过JS和媒体查询控制显示 */
+    margin: 5px 0; /* 上下外边距 */
+    font-size: 0.95rem; /* 字体大小 */
+    color: #00aaff; /* 蓝色文字 */
+    animation: pulse 2s infinite; /* 脉冲动画 */
 } 

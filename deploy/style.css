@@ -107,40 +107,49 @@ body::before {
 
 /* 触摸控制样式 */
 .mobile-controls {
-    display: none; /* 默认隐藏 */
+    display: none; /* 默认隐藏，通过JS动态控制 */
     position: absolute; /* 绝对定位 */
-    bottom: 20px; /* 距底部距离 */
-    left: 20px; /* 距左侧距离 */
-    z-index: 100; /* 确保在上层 */
+    top: 0; /* 从顶部开始 */
+    left: 0; /* 从左侧开始 */
+    width: 100%; /* 宽度100% */
+    height: 100%; /* 高度100% */
+    z-index: 1000; /* 确保在最上层 */
+    pointer-events: auto; /* 启用触摸事件 */
+    touch-action: none; /* 阻止浏览器默认触摸行为 */
 }
 
 .joystick-area {
-    width: 120px; /* 摇杆区域宽度 */
-    height: 120px; /* 摇杆区域高度 */
+    width: 100%; /* 覆盖整个区域 */
+    height: 100%; /* 覆盖整个区域 */
     position: relative; /* 相对定位 */
+    pointer-events: auto; /* 启用触摸事件 */
+    touch-action: none; /* 阻止浏览器默认触摸行为 */
 }
 
 .joystick-base {
     width: 80px; /* 摇杆基座宽度 */
     height: 80px; /* 摇杆基座高度 */
-    background-color: rgba(255, 255, 255, 0.2); /* 半透明白色 */
+    background-color: rgba(255, 255, 255, 0.3); /* 增加透明度 */
     border-radius: 50%; /* 圆形 */
     position: absolute; /* 绝对定位 */
-    left: 20px; /* 左侧位置 */
-    top: 20px; /* 顶部位置 */
-    display: flex; /* 弹性布局 */
+    display: none; /* 默认隐藏，动态显示 */
     justify-content: center; /* 水平居中 */
     align-items: center; /* 垂直居中 */
-    border: 1px solid rgba(255, 255, 255, 0.3); /* 边框 */
+    border: 2px solid rgba(255, 255, 255, 0.5); /* 增加边框可见性 */
+    box-shadow: 0 0 10px rgba(100, 200, 255, 0.7); /* 添加阴影提高可见性 */
+    z-index: 1001; /* 确保在上层 */
 }
 
 .joystick-thumb {
-    width: 30px; /* 摇杆手柄宽度 */
-    height: 30px; /* 摇杆手柄高度 */
-    background-color: rgba(255, 255, 255, 0.6); /* 半透明白色 */
+    width: 40px; /* 增加摇杆手柄宽度 */
+    height: 40px; /* 增加摇杆手柄高度 */
+    background-color: rgba(255, 255, 255, 0.7); /* 增加透明度 */
     border-radius: 50%; /* 圆形 */
     position: absolute; /* 绝对定位 */
-    border: 1px solid rgba(255, 255, 255, 0.8); /* 边框 */
+    display: none; /* 默认隐藏，动态显示 */
+    border: 2px solid rgba(255, 255, 255, 0.8); /* 增加边框可见性 */
+    box-shadow: 0 0 10px rgba(100, 200, 255, 0.9); /* 添加阴影提高可见性 */
+    z-index: 1002; /* 确保在最上层 */
 }
 
 /* 响应式设计 */
@@ -149,15 +158,16 @@ body::before {
         width: 100%; /* 宽度100% */
         height: auto; /* 自适应高度 */
         aspect-ratio: 1 / 1; /* 保持1:1宽高比 */
+        position: relative; /* 相对定位 */
+        overflow: hidden; /* 隐藏溢出 */
+        touch-action: none; /* 阻止浏览器默认触摸行为 */
     }
     
     .game-header h1 {
         font-size: 2rem; /* 较小字号 */
     }
     
-    .mobile-controls {
-        display: block; /* 在移动设备上显示控制器 */
-    }
+    /* 控制现在由JS管理，而不是CSS */
 }
 
 /* 针对小屏幕设备的额外调整 */
@@ -186,15 +196,13 @@ body::before {
     }
     
     .joystick-base {
-        width: 70px; /* 更小的摇杆基座 */
-        height: 70px; /* 更小的摇杆基座 */
-        left: 15px; /* 调整位置 */
-        top: 15px; /* 调整位置 */
+        width: 100px; /* 更大的摇杆基座 */
+        height: 100px;
     }
     
     .joystick-thumb {
-        width: 25px; /* 更小的摇杆手柄 */
-        height: 25px; /* 更小的摇杆手柄 */
+        width: 50px; /* 更大的摇杆手柄 */
+        height: 50px;
     }
 }
 
@@ -225,14 +233,11 @@ body::before {
     }
     
     .mobile-controls {
-        position: relative; /* 相对定位 */
-        bottom: auto; /* 移除底部定位 */
-        left: auto; /* 移除左侧定位 */
-        display: flex; /* 弹性布局 */
-        align-items: center; /* 垂直居中 */
-        justify-content: center; /* 水平居中 */
-        margin: 0 10px; /* 添加外边距 */
-        width: 30%; /* 设置宽度 */
+        width: 100%; /* 宽度100% */
+        height: 100%; /* 高度100% */
+        position: absolute; /* 绝对定位 */
+        top: 0; /* 顶部对齐 */
+        left: 0; /* 左侧对齐 */
     }
 }
 

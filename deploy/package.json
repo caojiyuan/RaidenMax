@@ -1,0 +1,15 @@
+{
+  "name": "raiden-max-deploy",
+  "version": "1.0.0",
+  "description": "雷电MAX游戏部署工具",
+  "private": true,
+  "scripts": {
+    "deploy": "node deploy-github.js",
+    "serve": "cd .. && node server.js",
+    "build": "bash deploy.sh ../dist --prod",
+    "start": "bash deploy.sh ../dist --dev --serve"
+  },
+  "dependencies": {
+    "gh-pages": "^6.0.0"
+  }
+} 
